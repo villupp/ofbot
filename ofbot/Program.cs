@@ -5,18 +5,21 @@ using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Azure.WebJobs;
 using OfBot.TableStorage;
 using OfBot.TableStorage.Models;
+using Microsoft.Extensions.Logging;
 
 namespace OfBot
 {
     public class Program
     {
+        private static BotSettings botSettings;
+
         private static void Main(string[] args)
         {
             var host = Host.CreateDefaultBuilder(args).ConfigureServices((hostContext, services) =>
             {
-                var botSettings = new BotSettings();
                 hostContext.Configuration.Bind(nameof(BotSettings), botSettings);
 
                 var discordSocketConfig = new DiscordSocketConfig()
@@ -28,6 +31,8 @@ namespace OfBot
                 {
                     CaseSensitiveCommands = false
                 };
+
+
 
                 services.AddAzureClients(builder =>
                 {
@@ -47,6 +52,11 @@ namespace OfBot
                 services.AddSingleton<MessageHandler>();
                 services.AddSingleton<TableStorageService<Command>>();
             })
+                .ConfigureLogging((context, builder) => {
+                    string instrumentationKey = botSettings.ApplicationInsightsKey;
+                    if (!string.IsNullOrEmpty(instrumentationKey))
+                        builder.AddApplicationInsightsWebJobs(o => o.InstrumentationKey = instrumentationKey);
+                })
             .Build();
 
             host.Run();

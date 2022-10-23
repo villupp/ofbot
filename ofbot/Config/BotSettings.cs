@@ -4,5 +4,6 @@
     {
         public string BotToken { get; set; }
         public string StorageKey { get; set; }
+        public string ApplicationInsightsKey { get; set; }
     }
 }
