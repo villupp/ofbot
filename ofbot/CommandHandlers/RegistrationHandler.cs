@@ -25,11 +25,11 @@ namespace OfBot.CommandHandlers
             {
                 session.Users.Add(userName);
 
-                await component.RespondAsync($"{userName} is in!\n{CreateLineupString(session)}");
+                await component.RespondAsync($"{userName} is in! {CreateLineupString(session)}");
             }
             else
             {
-                await component.RespondAsync($"{userName} is already in!\n{CreateLineupString(session)}");
+                await component.RespondAsync($"{userName} is already in! {CreateLineupString(session)}");
             }
         }
 
@@ -41,7 +41,7 @@ namespace OfBot.CommandHandlers
             {
                 session.Users.Remove(userName);
 
-                await component.RespondAsync($"{userName} changed their mind :(\n{CreateLineupString(session)}");
+                await component.RespondAsync($"{userName} changed their mind :(. {CreateLineupString(session)}");
             }
             else
                 await component.RespondAsync($"{userName} is not going to participate in '{session.Description}' :(");
