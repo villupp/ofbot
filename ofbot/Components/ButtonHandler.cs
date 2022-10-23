@@ -26,6 +26,8 @@ namespace OfBot.Components
                 await registrationHandler.OnRegister(buttonCustomId, component);
             else if (registrationHandler.Sessions.Any(rs => rs.UnregisterButtonId == buttonCustomId))
                 await registrationHandler.OnUnregister(buttonCustomId, component);
+            else
+                await component.DeferAsync();
         }
     }
 }

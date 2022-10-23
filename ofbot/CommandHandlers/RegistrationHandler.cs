@@ -21,37 +21,33 @@ namespace OfBot.CommandHandlers
         {
             var session = GetSession(registerButtonId);
 
-            if (!session.Users.Contains(userName))
-            {
-                session.Users.Add(userName);
+            if (!component.HasResponded)
+                await component.RespondAsync(CreateLineupString(session));
 
-                await component.RespondAsync($"{userName} is in! {CreateLineupString(session)}");
-            }
-            else
-            {
-                await component.RespondAsync($"{userName} is already in! {CreateLineupString(session)}");
-            }
+            if (!session.Users.Contains(userName))
+                session.Users.Add(userName);
+            
+            await component.ModifyOriginalResponseAsync(mp => { mp.Content = CreateLineupString(session); });
         }
 
         private async Task RemoveUserFromSession(Guid unregisterButtonId, string userName, SocketMessageComponent component)
         {
             var session = GetSession(unregisterButtonId);
 
+            if (!component.HasResponded)
+                await component.RespondAsync(CreateLineupString(session));
+
             if (session.Users.Contains(userName))
-            {
                 session.Users.Remove(userName);
 
-                await component.RespondAsync($"{userName} changed their mind :(. {CreateLineupString(session)}");
-            }
-            else
-                await component.RespondAsync($"{userName} is not going to participate in '{session.Description}' :(");
+            await component.ModifyOriginalResponseAsync(mp => { mp.Content = CreateLineupString(session); });
         }
 
         private string CreateLineupString(RegistrationSession session)
         {
             if (session.Users.Count == 0)
                 return $"No users in lineup for '{session.Description}'";
-            
+
             return $"Lineup ({session.Users.Count}) for '{session.Description}': {string.Join(", ", session.Users)}";
         }
 
