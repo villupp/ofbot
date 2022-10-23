@@ -17,7 +17,7 @@ namespace OfBot.CommandHandlers
             Sessions = new List<RegistrationSession>();
         }
 
-        private async Task AddUserToSession(Guid registerButtonId, string userName, ISocketMessageChannel channel)
+        private async Task AddUserToSession(Guid registerButtonId, string userName, SocketMessageComponent component)
         {
             var session = GetSession(registerButtonId);
 
@@ -25,15 +25,15 @@ namespace OfBot.CommandHandlers
             {
                 session.Users.Add(userName);
 
-                await channel.SendMessageAsync($"{userName} is in!\n{CreateLineupString(session)}");
+                await component.RespondAsync($"{userName} is in!\n{CreateLineupString(session)}");
             }
             else
             {
-                await channel.SendMessageAsync($"{userName} is already in!\n{CreateLineupString(session)}");
+                await component.RespondAsync($"{userName} is already in!\n{CreateLineupString(session)}");
             }
         }
 
-        private async Task RemoveUserFromSession(Guid unregisterButtonId, string userName, ISocketMessageChannel channel)
+        private async Task RemoveUserFromSession(Guid unregisterButtonId, string userName, SocketMessageComponent component)
         {
             var session = GetSession(unregisterButtonId);
 
@@ -41,8 +41,10 @@ namespace OfBot.CommandHandlers
             {
                 session.Users.Remove(userName);
 
-                await channel.SendMessageAsync($"{userName} changed their mind :(\n{CreateLineupString(session)}");
+                await component.RespondAsync($"{userName} changed their mind :(\n{CreateLineupString(session)}");
             }
+            else
+                await component.RespondAsync($"{userName} is not going to participate in '{session.Description}' :(");
         }
 
         private string CreateLineupString(RegistrationSession session)
@@ -56,13 +58,13 @@ namespace OfBot.CommandHandlers
         public async Task OnRegister(Guid registerButtonId, SocketMessageComponent component)
         {
             var userName = component.User.Username;
-            await AddUserToSession(registerButtonId, userName, component.Channel);
+            await AddUserToSession(registerButtonId, userName, component);
         }
 
         public async Task OnUnregister(Guid unregisterButtonId, SocketMessageComponent component)
         {
             var userName = component.User.Username;
-            await RemoveUserFromSession(unregisterButtonId, userName, component.Channel);
+            await RemoveUserFromSession(unregisterButtonId, userName, component);
         }
 
         public void CreateSession(Guid registerButtonId, Guid unregisterButtonId, string description, string initialUserName)
