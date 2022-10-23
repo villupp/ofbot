@@ -18,7 +18,6 @@ namespace OfBot.Modules
         // -ofbot git --> <github link>
         [Command("git")]
         [Summary("Link to ofbot git version control.")]
-        [Alias("how", "whois")]
         public async Task LinkGit()
         {
             var gitLink = $"https://github.com/villupp/ofbot/tree/main/ofbot/TableStorage";
