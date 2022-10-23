@@ -17,50 +17,34 @@ namespace OfBot.CommandHandlers
             Sessions = new List<RegistrationSession>();
         }
 
-        private async Task AddUserToSession(Guid registerButtonId, string userName, SocketMessageComponent component)
-        {
-            var session = GetSession(registerButtonId);
-
-            if (!component.HasResponded)
-                await component.RespondAsync(CreateLineupString(session));
-
-            if (!session.Users.Contains(userName))
-                session.Users.Add(userName);
-            
-            await component.ModifyOriginalResponseAsync(mp => { mp.Content = CreateLineupString(session); });
-        }
-
-        private async Task RemoveUserFromSession(Guid unregisterButtonId, string userName, SocketMessageComponent component)
-        {
-            var session = GetSession(unregisterButtonId);
-
-            if (!component.HasResponded)
-                await component.RespondAsync(CreateLineupString(session));
-
-            if (session.Users.Contains(userName))
-                session.Users.Remove(userName);
-
-            await component.ModifyOriginalResponseAsync(mp => { mp.Content = CreateLineupString(session); });
-        }
-
         private string CreateLineupString(RegistrationSession session)
         {
             if (session.Users.Count == 0)
-                return $"No users in lineup for '{session.Description}'";
+                return $"{session.Description}\nNo users in lineup.'";
 
-            return $"Lineup ({session.Users.Count}) for '{session.Description}': {string.Join(", ", session.Users)}";
+            return $"{session.Description}\nLineup ({session.Users.Count}): {string.Join(", ", session.Users)}.";
         }
 
         public async Task OnRegister(Guid registerButtonId, SocketMessageComponent component)
         {
             var userName = component.User.Username;
-            await AddUserToSession(registerButtonId, userName, component);
+            var session = GetSession(registerButtonId);
+
+            if (!session.Users.Contains(userName))
+                session.Users.Add(userName);
+
+            await component.UpdateAsync(mp => { mp.Content = CreateLineupString(session); });
         }
 
         public async Task OnUnregister(Guid unregisterButtonId, SocketMessageComponent component)
         {
             var userName = component.User.Username;
-            await RemoveUserFromSession(unregisterButtonId, userName, component);
+            var session = GetSession(unregisterButtonId);
+
+            if (session.Users.Contains(userName))
+                session.Users.Remove(userName);
+
+            await component.UpdateAsync(mp => { mp.Content = CreateLineupString(session); });
         }
 
         public void CreateSession(Guid registerButtonId, Guid unregisterButtonId, string description, string initialUserName)
