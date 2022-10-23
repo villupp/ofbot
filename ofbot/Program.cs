@@ -1,12 +1,10 @@
-﻿using Azure.Data.Tables;
-using Discord;
+﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using OfBot.TableStorage;
 using OfBot.TableStorage.Models;
 
@@ -30,8 +28,6 @@ namespace OfBot
                 {
                     CaseSensitiveCommands = false
                 };
-
-
 
                 services.AddAzureClients(builder =>
                 {

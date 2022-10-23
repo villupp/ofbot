@@ -17,7 +17,7 @@ namespace OfBot.Modules
         [Summary("Echoes a message.")]
         public Task Say([Remainder][Summary("The text to echo")] string echo)
         {
-            logger.LogInformation($"Replying: '{echo}'");
+            logger.LogInformation($"Echo called. Replying: '{echo}'");
             return ReplyAsync(echo);
         }
     }

@@ -58,13 +58,27 @@ namespace OfBot
             }
             else if (message.Content.ToLower().StartsWith($"{CUSTOM_COMMAND_PREFIX}set "))
             {
+                // Set custom command
+                // !set !<command> <content>
+                // !set <command> <content>
                 logger.LogInformation($"Got custom command set: '{message.Content}'");
                 await customCommandService.Set(message, context);
             }
+            else if (message.Content.ToLower().StartsWith($"{CUSTOM_COMMAND_PREFIX}remove ") ||
+                message.Content.ToLower().StartsWith($"{CUSTOM_COMMAND_PREFIX}delete "))
+            {
+                // Remove custom command
+                // !remove !<command>
+                // !remove <command>
+                logger.LogInformation($"Got custom command remove: '{message.Content}'");
+                await customCommandService.Remove(message, context);
+            }
             else if (message.HasCharPrefix(CUSTOM_COMMAND_PREFIX, ref argPos))
             {
-                logger.LogInformation($"Got custom command: '{message.Content}'");
-                await customCommandService.Execute(message, context, argPos);
+                // Execute custom command
+                // !<command>
+                logger.LogInformation($"Executing custom command: '{message.Content}'");
+                await customCommandService.Execute(message, context);
             }
             else
             {

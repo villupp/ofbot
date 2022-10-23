@@ -19,7 +19,7 @@ namespace OfBot
             this.commandTableService = commandTableService;
         }
 
-        public async Task Execute(SocketUserMessage message, SocketCommandContext context, int argPos)
+        public async Task Execute(SocketUserMessage message, SocketCommandContext context)
         {
             var commandName = ParseCustomCommandName(message.Content);
 
@@ -31,7 +31,7 @@ namespace OfBot
             {
                 var existingCommand = existingCommands[0];
                 var content = existingCommand.Content;
-                logger.LogInformation($"Responding to custom command '{commandName}': '{content}'");
+                logger.LogInformation($"Responding to custom command '{commandName}' (RowKey {existingCommand.RowKey}): '{content}'");
                 await context.Channel.SendMessageAsync(content);
             }
             else
@@ -40,6 +40,55 @@ namespace OfBot
                 logger.LogInformation(msg);
                 await context.Channel.SendMessageAsync(msg);
             }
+        }
+
+        public async Task<bool> Remove(SocketUserMessage message, SocketCommandContext context)
+        {
+            var isSuccess = false;
+
+            var messageParts = message.Content.Split(' ');
+
+            if (messageParts.Length < 2)
+            {
+                logger.LogInformation($"Invalid use of remove command: '{message.Content}'");
+                return false;
+            }
+
+            var commandName = ParseCustomCommandName(messageParts[1]);
+
+            logger.LogInformation($"Removing command '{commandName}'");
+
+            var existingCommands = await commandTableService.Get(command => command.Name == commandName);
+
+            if (existingCommands.Count > 0)
+            {
+                var existingCommand = existingCommands[0];
+
+                logger.LogInformation($"Existing command '{commandName}' found, RowKey {existingCommand.RowKey}");
+
+                isSuccess = await commandTableService.Delete(existingCommand);
+
+                if (isSuccess)
+                {
+                    var msg = $"Custom command '{commandName}' removed successfully.";
+                    logger.LogInformation($"{msg} RowKey {existingCommand.RowKey}.");
+                    await context.Channel.SendMessageAsync(msg);
+                }
+                else
+                {
+                    var msg = $"Custom command '{commandName}' removal failed. See logs for details.";
+                    logger.LogInformation($"{msg} RowKey {existingCommand.RowKey}.");
+                    await context.Channel.SendMessageAsync(msg);
+                }
+            }
+            else
+            {
+                var msg = $"Could not find command '{commandName}'.";
+                logger.LogInformation(msg);
+                await context.Channel.SendMessageAsync(msg);
+            }
+
+            return isSuccess;
         }
 
         public async Task<bool> Set(SocketUserMessage message, SocketCommandContext context)
