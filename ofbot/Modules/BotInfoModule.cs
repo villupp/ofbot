@@ -20,7 +20,7 @@ namespace OfBot.Modules
         [Summary("Link to ofbot git version control.")]
         public async Task LinkGit()
         {
-            var gitLink = $"https://github.com/villupp/ofbot/tree/main/ofbot/TableStorage";
+            var gitLink = $"https://github.com/villupp/ofbot";
 
             logger.LogInformation($"LinkGit called. Linking git {gitLink}");
 
@@ -38,7 +38,7 @@ namespace OfBot.Modules
 
             var commandPrefix = MessageHandler.COMMAND_PREFIX;
             var customCommandPrefix = MessageHandler.CUSTOM_COMMAND_PREFIX;
-            await Context.Channel.SendMessageAsync($"Some useful commands: {commandPrefix}ofbot git, {commandPrefix}ofbot help, {commandPrefix} whois <user>.\n" +
+            await Context.Channel.SendMessageAsync($"Some useful commands: {commandPrefix}ofbot git, {commandPrefix}ofbot help, {commandPrefix}whois <user>.\n" +
                 $"Custom commands use {customCommandPrefix} prefix.\nTo set (add or update) a custom command:\n{customCommandPrefix}set <command name> <command content>.\n" +
                 $"To remove custom command:\n{customCommandPrefix}remove <command name>.");
         }
