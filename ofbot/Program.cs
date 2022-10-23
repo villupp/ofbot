@@ -20,7 +20,9 @@ namespace OfBot
         {
             var host = Host.CreateDefaultBuilder(args).ConfigureServices((hostContext, services) =>
             {
-                hostContext.Configuration.Bind(nameof(BotSettings), botSettings);
+                var settings = new BotSettings();
+                hostContext.Configuration.Bind(nameof(BotSettings), settings);
+                botSettings = settings;
 
                 var discordSocketConfig = new DiscordSocketConfig()
                 {
@@ -31,8 +33,6 @@ namespace OfBot
                 {
                     CaseSensitiveCommands = false
                 };
-
-
 
                 services.AddAzureClients(builder =>
                 {
