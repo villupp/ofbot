@@ -1,14 +1,16 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Azure.WebJobs;
+using Microsoft.Extensions.Logging;
+using OfBot.CommandHandlers;
+using OfBot.Components;
 using OfBot.TableStorage;
 using OfBot.TableStorage.Models;
-using Microsoft.Extensions.Logging;
 
 namespace OfBot
 {
@@ -51,8 +53,11 @@ namespace OfBot
                 services.AddSingleton<CustomCommandService>();
                 services.AddSingleton<MessageHandler>();
                 services.AddSingleton<TableStorageService<Command>>();
+                services.AddSingleton<RegistrationHandler>();
+                services.AddSingleton<ButtonHandler>();
             })
-                .ConfigureLogging((context, builder) => {
+                .ConfigureLogging((context, builder) =>
+                {
                     string instrumentationKey = botSettings.ApplicationInsightsKey;
                     if (!string.IsNullOrEmpty(instrumentationKey))
                         builder.AddApplicationInsightsWebJobs(o => o.InstrumentationKey = instrumentationKey);

@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using OfBot.Components;
 using System.Reflection;
 
 namespace OfBot
@@ -15,6 +16,7 @@ namespace OfBot
         private readonly DiscordSocketClient discordSocketClient;
         private readonly CommandService commandService;
         private readonly IServiceProvider serviceProvider;
+        private readonly ButtonHandler buttonHandler;
 
         public BotService(
             ILogger<BotService> logger,
@@ -22,7 +24,8 @@ namespace OfBot
             BotSettings botSettings,
             DiscordSocketClient discordSocketClient,
             CommandService commandService,
-            IServiceProvider serviceProvider
+            IServiceProvider serviceProvider,
+            ButtonHandler buttonHandler
             )
         {
             appLifetime.ApplicationStarted.Register(OnStarted);
@@ -34,6 +37,7 @@ namespace OfBot
             this.discordSocketClient = discordSocketClient;
             this.commandService = commandService;
             this.serviceProvider = serviceProvider;
+            this.buttonHandler = buttonHandler;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -55,6 +59,8 @@ namespace OfBot
                 logger.LogInformation("Bot is connected and ready");
                 return Task.CompletedTask;
             };
+
+            discordSocketClient.ButtonExecuted += buttonHandler.OnButtonExecuted;
 
             await InstallCommands();
         }
