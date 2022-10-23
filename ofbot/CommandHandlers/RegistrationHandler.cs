@@ -20,7 +20,7 @@ namespace OfBot.CommandHandlers
         private string CreateLineupString(RegistrationSession session)
         {
             if (session.Users.Count == 0)
-                return $"{session.Description}\nNo users in lineup.'";
+                return $"{session.Description}\nNo users in lineup.";
 
             return $"{session.Description}\nLineup ({session.Users.Count}): {string.Join(", ", session.Users)}.";
         }
