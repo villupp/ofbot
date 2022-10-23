@@ -22,7 +22,7 @@ name: Deploy .NET WebJob to Azure App Service
 env:
   WEBJOB_NAME: OfBotWorker
   AZURE_APP_NAME: ofbot-app
-  PROJECT_ROOT: .\ofbot\OfBot.csproj
+  PROJECT_ROOT: ./ofbot/OfBot.csproj
   DOTNET_VERSION: '6'
 
 on:
