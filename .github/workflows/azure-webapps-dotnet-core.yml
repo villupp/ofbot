@@ -17,7 +17,7 @@
 # For more information on the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # For more samples to get started with GitHub Action workflows to deploy to Azure: https://github.com/Azure/actions-workflow-samples
 
-name: Deploy WebJob
+name: Deploy .NET WebJob to Azure App Service
 
 env:
   WEBJOB_NAME: OfBotWorker
@@ -39,13 +39,13 @@ jobs:
 
     steps:
     # Checkout the repo
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     # Setup .NET Core SDK
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
+        dotnet-version: 6.0.x
 
     - name: dotnet publish
       run: |
