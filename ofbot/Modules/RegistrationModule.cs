@@ -2,6 +2,7 @@
 using Discord.Commands;
 using Microsoft.Extensions.Logging;
 using OfBot.CommandHandlers;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace OfBot.Modules
 {
@@ -21,7 +22,7 @@ namespace OfBot.Modules
         // -registration dotkkaa klo 16?
         [Command("registration")]
         [Summary("Initiates a registration message with registration buttons.")]
-        [Alias("dotaa", "dota", "cs", "jengi", "letsplay", "reg", "peliä", "matsi", "roster", "rosteri", "pubg", "lineup")]
+        [Alias("dotaa", "dota", "cs", "jengi", "letsplay", "reg", "peliä", "matsi", "roster", "rosteri", "pubg", "lineup", "r", "reg", "game", "game" , "g")]
         public async Task StartRegistration([Summary("Optional button description.")] params string[] descParams)
         {
             var description = string.Join(" ", descParams);
@@ -33,14 +34,14 @@ namespace OfBot.Modules
 
             if (string.IsNullOrEmpty(description))
                 description = $"{Context.User.Username}'s event";
-
-            registrationHandler.CreateSession(registerButtonId, unregisterButtonId, description, Context.User.Username);
+            
+            var session = registrationHandler.CreateSession(registerButtonId, unregisterButtonId, description, Context.User.Username);
 
             var builder = new ComponentBuilder()
                 .WithButton("I'm in!", registerButtonId.ToString(), ButtonStyle.Success)
                 .WithButton("I'm out..", unregisterButtonId.ToString(), ButtonStyle.Secondary);
 
-            await ReplyAsync(description, components: builder.Build());
+            await ReplyAsync(registrationHandler.CreateLineupString(session), components: builder.Build());
         }
     }
 }

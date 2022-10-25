@@ -2,7 +2,15 @@
 {
     public class RegistrationSession
     {
-        public List<string> Users { get; set; }
+        public RegistrationSession()
+        {
+            InUsers = new List<string>();
+            OutUsers = new List<string>();
+        }
+
+        public List<string> InUsers { get; set; }
+
+        public List<string> OutUsers { get; set; }
 
         public Guid RegisterButtonId { get; set; }
 

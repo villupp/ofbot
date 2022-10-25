@@ -17,12 +17,19 @@ namespace OfBot.CommandHandlers
             Sessions = new List<RegistrationSession>();
         }
 
-        private string CreateLineupString(RegistrationSession session)
+        public string CreateLineupString(RegistrationSession session)
         {
-            if (session.Users.Count == 0)
-                return $"{session.Description}\nNo users in lineup.";
+            var lineupStr = string.Empty;
 
-            return $"{session.Description}\nLineup ({session.Users.Count}): {string.Join(", ", session.Users)}.";
+            if (session.InUsers.Count == 0)
+                lineupStr = $"{session.Description}\nNo users in lineup.";
+            else 
+                lineupStr = $"{session.Description}\nLineup ({session.InUsers.Count}): {string.Join(", ", session.InUsers)}";
+
+            if (session.OutUsers.Count > 0)
+                lineupStr += $"\nOut: {string.Join(", ", session.OutUsers)}.";
+
+            return lineupStr;
         }
 
         public async Task OnRegister(Guid registerButtonId, SocketMessageComponent component)
@@ -30,8 +37,11 @@ namespace OfBot.CommandHandlers
             var userName = component.User.Username;
             var session = GetSession(registerButtonId);
 
-            if (!session.Users.Contains(userName))
-                session.Users.Add(userName);
+            if (!session.InUsers.Contains(userName))
+                session.InUsers.Add(userName);
+
+            if (session.OutUsers.Contains(userName))
+                session.OutUsers.Remove(userName);
 
             await component.UpdateAsync(mp => { mp.Content = CreateLineupString(session); });
         }
@@ -41,13 +51,16 @@ namespace OfBot.CommandHandlers
             var userName = component.User.Username;
             var session = GetSession(unregisterButtonId);
 
-            if (session.Users.Contains(userName))
-                session.Users.Remove(userName);
+            if (session.InUsers.Contains(userName))
+                session.InUsers.Remove(userName);
+            
+            if (!session.OutUsers.Contains(userName))
+                session.OutUsers.Add(userName);
 
             await component.UpdateAsync(mp => { mp.Content = CreateLineupString(session); });
         }
 
-        public void CreateSession(Guid registerButtonId, Guid unregisterButtonId, string description, string initialUserName)
+        public RegistrationSession CreateSession(Guid registerButtonId, Guid unregisterButtonId, string description, string initialUserName)
         {
             logger.LogInformation($"Creating new registration session with register button ID {registerButtonId}, description: '{description}'");
 
@@ -55,15 +68,18 @@ namespace OfBot.CommandHandlers
             {
                 RegisterButtonId = registerButtonId,
                 UnregisterButtonId = unregisterButtonId,
-                Description = description,
-                Users = new List<string>() { initialUserName }
+                Description = description
             };
+
+            session.InUsers.Add(initialUserName);
 
             // Only keep max 10 session in memory
             if (Sessions.Count > 10)
                 Sessions.RemoveAt(0);
 
             Sessions.Add(session);
+
+            return session;
         }
 
         private RegistrationSession GetSession(Guid buttonId)
