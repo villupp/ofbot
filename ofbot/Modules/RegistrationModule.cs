@@ -2,7 +2,6 @@
 using Discord.Commands;
 using Microsoft.Extensions.Logging;
 using OfBot.CommandHandlers;
-using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace OfBot.Modules
 {
