@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using Microsoft.Extensions.Logging;
 using OfBot.TableStorage;
 using OfBot.TableStorage.Models;
+using System.Text.RegularExpressions;
 
 namespace OfBot
 {
@@ -110,6 +111,13 @@ namespace OfBot
             }
 
             var commandName = ParseCustomCommandName(messageParts[1]);
+            
+            if (!Regex.IsMatch(commandName, "^[A-Za-z0-9]*$"))
+            {
+                await context.Channel.SendMessageAsync($"Invalid command name. Command name may only contain letters and numbers.");
+                return false;
+            }
+            
             var commandContent = string.Join(' ', messageParts.Skip(2).ToArray());
 
             logger.LogInformation($"Setting command '{commandName}' to '{commandContent}'");
