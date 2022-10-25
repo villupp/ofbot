@@ -39,8 +39,12 @@ namespace OfBot.Modules
             var commandPrefix = MessageHandler.COMMAND_PREFIX;
             var customCommandPrefix = MessageHandler.CUSTOM_COMMAND_PREFIX;
             await Context.Channel.SendMessageAsync($"Some useful commands: {commandPrefix}ofbot git, {commandPrefix}ofbot help, {commandPrefix}whois <user>.\n" +
+                $"To create a registration/lineup session:\n" +
+                $"{commandPrefix}reg <event description> or {commandPrefix}r <event description>\n" +
                 $"Custom commands use {customCommandPrefix} prefix.\nTo set (add or update) a custom command:\n{customCommandPrefix}set <command name> <command content>.\n" +
-                $"To remove custom command:\n{customCommandPrefix}remove <command name>.");
+                $"To remove custom command:\n{customCommandPrefix}remove <command name>.\n" +
+                $"To search for custom commands:\n{customCommandPrefix}search <search input> or {customCommandPrefix}s <search input>"
+                );
         }
     }
 }

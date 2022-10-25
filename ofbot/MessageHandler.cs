@@ -56,7 +56,8 @@ namespace OfBot
                     argPos: argPos,
                     services: serviceProvider);
             }
-            else if (message.Content.ToLower().StartsWith($"{CUSTOM_COMMAND_PREFIX}set "))
+            else if (message.Content.ToLower().StartsWith($"{CUSTOM_COMMAND_PREFIX}set ") ||
+                message.Content.ToLower() == $"{CUSTOM_COMMAND_PREFIX}set")
             {
                 // Set custom command
                 // !set !<command> <content>
@@ -65,13 +66,26 @@ namespace OfBot
                 await customCommandService.Set(message, context);
             }
             else if (message.Content.ToLower().StartsWith($"{CUSTOM_COMMAND_PREFIX}remove ") ||
-                message.Content.ToLower().StartsWith($"{CUSTOM_COMMAND_PREFIX}delete "))
+                message.Content.ToLower().StartsWith($"{CUSTOM_COMMAND_PREFIX}delete ") ||
+                message.Content.ToLower() == $"{CUSTOM_COMMAND_PREFIX}remove" ||
+                message.Content.ToLower() == $"{CUSTOM_COMMAND_PREFIX}delete")
             {
                 // Remove custom command
                 // !remove !<command>
                 // !remove <command>
                 logger.LogInformation($"Got custom command remove: '{message.Content}'");
                 await customCommandService.Remove(message, context);
+            }
+            else if (message.Content.ToLower().StartsWith($"{CUSTOM_COMMAND_PREFIX}search ") ||
+                message.Content.ToLower().StartsWith($"{CUSTOM_COMMAND_PREFIX}s ") ||
+                message.Content.ToLower() == $"{CUSTOM_COMMAND_PREFIX}search" ||
+                message.Content.ToLower() == $"{CUSTOM_COMMAND_PREFIX}s")
+            {
+                // Remove custom command
+                // !search <command name>
+                // !s <command name>
+                logger.LogInformation($"Got custom command search: '{message.Content}'");
+                await customCommandService.Search(message, context);
             }
             else if (message.HasCharPrefix(CUSTOM_COMMAND_PREFIX, ref argPos))
             {

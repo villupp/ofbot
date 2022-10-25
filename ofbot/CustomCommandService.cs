@@ -50,7 +50,7 @@ namespace OfBot
 
             if (messageParts.Length < 2)
             {
-                logger.LogInformation($"Invalid use of remove command: '{message.Content}'");
+                await context.Channel.SendMessageAsync($"Invalid remove. Use '{MessageHandler.CUSTOM_COMMAND_PREFIX}remove <command name>'");
                 return false;
             }
 
@@ -105,7 +105,7 @@ namespace OfBot
 
             if (messageParts.Length < 3)
             {
-                logger.LogInformation($"Invalid custom command set: '{message.Content}'");
+                await context.Channel.SendMessageAsync($"Invalid set. Use '{MessageHandler.CUSTOM_COMMAND_PREFIX}set <command name> <command content>'");
                 return false;
             }
 
@@ -157,6 +157,51 @@ namespace OfBot
             await context.Channel.SendMessageAsync(msg);
 
             return isSuccess;
+        }
+
+        public async Task Search(SocketUserMessage message, SocketCommandContext context)
+        {
+            // Setting command syntax:
+            // !search <search string>
+            // !search sami  --> list of commands containing "sami"
+            var messageParts = message.Content.Split(' ');
+
+            if (messageParts.Length < 2)
+            {
+                await context.Channel.SendMessageAsync($"Invalid search. Use '{MessageHandler.CUSTOM_COMMAND_PREFIX}search <search input>'");
+                return;
+            }
+
+            var searchStr = string.Join(' ', messageParts.Skip(1).ToArray()).ToLower().TrimStart(MessageHandler.CUSTOM_COMMAND_PREFIX).Trim();
+
+            if (searchStr.Length < 2)
+            {
+                await context.Channel.SendMessageAsync($"Be more specific (min. 2 characters).");
+                return;
+            }
+
+            logger.LogInformation($"Searching for custom commands with search string '{searchStr}'");
+
+            var allCommands = await commandTableService.Get();
+            var foundCommands = allCommands.Where(c => c.Name.Contains(searchStr)).ToList();
+
+            logger.LogInformation($"Found {foundCommands.Count} custom commands with search string '{searchStr}'");
+
+            var resStr = string.Empty;
+
+            if (foundCommands.Count == 0)
+            {
+                await context.Channel.SendMessageAsync($"Could not find any custom commands.");
+                return;
+            }
+
+            if (foundCommands.Count > 50)
+                resStr = $"Found {foundCommands.Count} commands. Showing 50 first.\n";
+
+            var commandNames = foundCommands.Select(c => c.Name).ToList();
+            commandNames.Sort();
+
+            await context.Channel.SendMessageAsync($"Available custom commands:\n{string.Join(", ", commandNames)}");
         }
 
         private string ParseCustomCommandName(string rawCommand)
