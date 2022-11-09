@@ -17,6 +17,7 @@ namespace OfBot
         private readonly CommandService commandService;
         private readonly IServiceProvider serviceProvider;
         private readonly ButtonHandler buttonHandler;
+        private readonly DotaPoller dotaPoller;
 
         public BotService(
             ILogger<BotService> logger,
@@ -25,7 +26,8 @@ namespace OfBot
             DiscordSocketClient discordSocketClient,
             CommandService commandService,
             IServiceProvider serviceProvider,
-            ButtonHandler buttonHandler
+            ButtonHandler buttonHandler,
+            DotaPoller dotaPoller
             )
         {
             appLifetime.ApplicationStarted.Register(OnStarted);
@@ -38,6 +40,7 @@ namespace OfBot
             this.commandService = commandService;
             this.serviceProvider = serviceProvider;
             this.buttonHandler = buttonHandler;
+            this.dotaPoller = dotaPoller;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -57,6 +60,7 @@ namespace OfBot
             discordSocketClient.Ready += () =>
             {
                 logger.LogInformation("Bot is connected and ready");
+                dotaPoller.Start(); // Start the dota tracker poller
                 return Task.CompletedTask;
             };
 
