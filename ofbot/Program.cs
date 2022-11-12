@@ -7,7 +7,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Http;
 using OfBot.CommandHandlers;
 using OfBot.Components;
 using OfBot.TableStorage;
@@ -45,7 +44,7 @@ namespace OfBot
 
 
                 services.AddHostedService<BotService>();
-                
+
                 services.AddSingleton(serviceProvider => serviceProvider);
                 services.AddSingleton(botSettings);
                 services.AddSingleton(discordSocketConfig);
@@ -55,10 +54,12 @@ namespace OfBot
                 services.AddSingleton<CustomCommandService>();
                 services.AddSingleton<MessageHandler>();
                 services.AddSingleton<TableStorageService<Command>>();
+                services.AddSingleton<TableStorageService<TrackedDotaPlayer>>();
                 services.AddSingleton<RegistrationHandler>();
                 services.AddSingleton<ButtonHandler>();
                 services.AddSingleton<AnnouncementService>();
                 services.AddSingleton<DotaPoller>();
+                services.AddSingleton<TrackedDotaPlayers>();
 
                 // Add steam dota 2 api http client
                 services.AddHttpClient<SteamApi>(client =>
