@@ -57,11 +57,11 @@ namespace OfBot
             await discordSocketClient.LoginAsync(TokenType.Bot, botSettings.BotToken);
             await discordSocketClient.StartAsync();
 
-            discordSocketClient.Ready += () =>
+            discordSocketClient.Ready += async () =>
             {
                 logger.LogInformation("Bot is connected and ready");
-                dotaPoller.Start(); // Start the dota tracker poller
-                return Task.CompletedTask;
+                logger.LogInformation("Starting dota tracker polling service");
+                await dotaPoller.Start(); // Start the dota tracker poller
             };
 
             discordSocketClient.ButtonExecuted += buttonHandler.OnButtonExecuted;
