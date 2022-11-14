@@ -102,7 +102,7 @@ namespace OfBot.DotaTracker
             }
             // Get player information from OpenDota Api
             var openDotaPlayer = await openDotaApi.GetPlayer(accountId);
-            if (openDotaPlayer == null)
+            if (openDotaPlayer == null || openDotaPlayer.profile == null || openDotaPlayer.profile.personaname == null)
             {
                 return (null, $"Couldn't validate account id {accountId}, OpenDota API might be down");
             }
