@@ -1,8 +1,6 @@
-using Microsoft.Extensions.Logging;
-
-namespace OfBot.Components.Api
+namespace OfBot.Components.Api.Dota
 {
-    public class MatchListResponse {
+    public class GetMatchDetailsResponse {
         public MatchSearchResult result { get; set; }
     }
     public class MatchSearchResult {

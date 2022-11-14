@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Logging;
-using OfBot.Components.Api;
+using OfBot.Components.Api.Dota;
 
 namespace OfBot.Components.DotaTracker
 {
@@ -70,7 +70,7 @@ namespace OfBot.Components.DotaTracker
                             await announcementService.Announce(
                                 botSettings.DotaTrackerAnnouncementGuild,
                                 botSettings.DotaTrackerAnnouncementChannel,
-                                $"{playerState.player.AccountId} played a match of dota\nhttps://www.opendota.com/matches/{recentMatchId}"
+                                $"{playerState.player.SteamName} played a match of dota\n<https://www.opendota.com/matches/{recentMatchId}>"
                             );
                         }
                     }

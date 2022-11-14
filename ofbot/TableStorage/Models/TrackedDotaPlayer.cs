@@ -11,5 +11,6 @@ namespace OfBot.TableStorage.Models
         public ETag ETag { get; set; }
         public string AddedBy { get; set; }
         public string AccountId { get; set; }
+        public string SteamName { get; set; }
     }
 }
