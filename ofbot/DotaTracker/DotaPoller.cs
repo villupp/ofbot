@@ -77,7 +77,7 @@ namespace OfBot.DotaTracker
                 }
                 catch (Exception e)
                 {
-                    logger.LogInformation($"Failed getting recent matches for account {playerState.player.AccountId}: {e.Message}");
+                    logger.LogError($"Failed getting recent matches for account {playerState.player.AccountId}: {e.Message}");
                 }
 
             }

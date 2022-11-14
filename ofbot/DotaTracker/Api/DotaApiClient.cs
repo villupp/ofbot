@@ -1,5 +1,4 @@
 using System.Net.Http.Json;
-using OfBot.Api.Dota;
 
 namespace OfBot.Api.Dota
 {
