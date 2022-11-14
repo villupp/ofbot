@@ -1,21 +1,21 @@
 using OfBot.TableStorage.Models;
 using OfBot.TableStorage;
-using OfBot.Components.Api.OpenDota;
-using OfBot.Components.Api.Dota;
+using OfBot.Api.OpenDota;
+using OfBot.Api.Dota;
 
-namespace OfBot.Components.DotaTracker
+namespace OfBot.DotaTracker
 {
     public class TrackedDotaPlayers
     {
         public List<TrackingState<TrackedDotaPlayer>> players { get; set; }
         private TableStorageService<TrackedDotaPlayer> tableService;
-        private DotaApi dotaApi;
-        private OpenDotaApi openDotaApi;
+        private DotaApiClient dotaApi;
+        private OpenDotaApiClient openDotaApi;
 
         public TrackedDotaPlayers(
             TableStorageService<TrackedDotaPlayer> commandTableService,
-            DotaApi dotaApi,
-            OpenDotaApi openDotaApi
+            DotaApiClient dotaApi,
+            OpenDotaApiClient openDotaApi
         )
         {
             this.players = new List<TrackingState<TrackedDotaPlayer>>();

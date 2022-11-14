@@ -1,20 +1,20 @@
 using Microsoft.Extensions.Logging;
-using OfBot.Components.Api.Dota;
+using OfBot.Api.Dota;
 
-namespace OfBot.Components.DotaTracker
+namespace OfBot.DotaTracker
 {
     public class DotaPoller
     {
         private readonly ILogger<DotaPoller> logger;
         private readonly AnnouncementService announcementService;
-        private readonly DotaApi dotaApi;
+        private readonly DotaApiClient dotaApi;
         private readonly TrackedDotaPlayers trackedPlayers;
         private readonly BotSettings botSettings;
 
         public DotaPoller(
             ILogger<DotaPoller> logger,
             AnnouncementService announcementService,
-            DotaApi dotaApi,
+            DotaApiClient dotaApi,
             TrackedDotaPlayers trackedPlayers,
             BotSettings botSettings
             )

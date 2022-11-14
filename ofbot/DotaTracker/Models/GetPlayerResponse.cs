@@ -1,4 +1,4 @@
-namespace OfBot.Components.Api.OpenDota
+namespace OfBot.Api.OpenDota
 {
     public class GetPlayerResponse {
         public Profile profile { get; set; }

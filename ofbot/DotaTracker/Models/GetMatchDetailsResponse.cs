@@ -1,4 +1,4 @@
-namespace OfBot.Components.Api.Dota
+namespace OfBot.Api.Dota
 {
     public class GetMatchDetailsResponse {
         public MatchSearchResult result { get; set; }

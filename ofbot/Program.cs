@@ -9,9 +9,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OfBot.CommandHandlers;
 using OfBot.Components;
-using OfBot.Components.DotaTracker;
-using OfBot.Components.Api.Dota;
-using OfBot.Components.Api.OpenDota;
+using OfBot.DotaTracker;
+using OfBot.Api.Dota;
+using OfBot.Api.OpenDota;
 using OfBot.TableStorage;
 using OfBot.TableStorage.Models;
 
@@ -64,8 +64,8 @@ namespace OfBot
                 services.AddSingleton<TableStorageService<TrackedDotaPlayer>>();
                 services.AddSingleton<DotaPoller>();
                 services.AddSingleton<TrackedDotaPlayers>();
-                services.AddHttpClient<DotaApi>(client => { client.BaseAddress = new Uri("https://api.steampowered.com"); });
-                services.AddHttpClient<OpenDotaApi>(client => { client.BaseAddress = new Uri("https://api.opendota.com"); });
+                services.AddHttpClient<DotaApiClient>(client => { client.BaseAddress = new Uri("https://api.steampowered.com"); });
+                services.AddHttpClient<OpenDotaApiClient>(client => { client.BaseAddress = new Uri("https://api.opendota.com"); });
             })
                 .ConfigureLogging((context, builder) =>
                 {

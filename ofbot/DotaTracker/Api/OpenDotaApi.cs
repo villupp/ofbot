@@ -1,14 +1,14 @@
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Json;
 
-namespace OfBot.Components.Api.OpenDota
+namespace OfBot.Api.OpenDota
 {
-    public class OpenDotaApi
+    public class OpenDotaApiClient
     {
         private readonly BotSettings botSettings;
         private readonly HttpClient httpClient;
 
-        public OpenDotaApi(
+        public OpenDotaApiClient(
             BotSettings botSettings,
             HttpClient httpClient
         )

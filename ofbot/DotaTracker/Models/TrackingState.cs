@@ -1,5 +1,5 @@
 
-namespace OfBot.Components.DotaTracker
+namespace OfBot.DotaTracker
 {
     public class TrackingState<T> {
         public T player { get; set; }

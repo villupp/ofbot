@@ -1,14 +1,14 @@
 using System.Net.Http.Json;
-using OfBot.Components.Api.Dota;
+using OfBot.Api.Dota;
 
-namespace OfBot.Components.Api.Dota
+namespace OfBot.Api.Dota
 {
-    public class DotaApi
+    public class DotaApiClient
     {
         private readonly BotSettings botSettings;
         private readonly HttpClient httpClient;
 
-        public DotaApi(
+        public DotaApiClient(
             BotSettings botSettings,
             HttpClient httpClient)
         {
