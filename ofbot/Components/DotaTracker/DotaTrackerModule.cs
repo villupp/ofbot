@@ -53,8 +53,8 @@ namespace OfBot.Modules
             {
                 try
                 {
-                    await playerStates.Add(accountId, initiatedBy);
-                    await Context.Channel.SendMessageAsync($"Tracking dota player {accountId}");
+                    var player = await playerStates.Add(accountId, initiatedBy);
+                    await Context.Channel.SendMessageAsync($"Tracking dota player {player.SteamName} [{accountId}]");
                 }
                 catch (Exception e)
                 {
@@ -75,8 +75,8 @@ namespace OfBot.Modules
             logger.LogInformation($"Dotatracker untrack command initiated by {Context.User.Username}");
             try
             {
-                await playerStates.Remove(accountId);
-                await Context.Channel.SendMessageAsync($"Removed tracked dota player {accountId}");
+                var player = await playerStates.Remove(accountId);
+                await Context.Channel.SendMessageAsync($"Removed tracked dota player {player.SteamName} [{accountId}]");
             }
             catch (Exception e)
             {

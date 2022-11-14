@@ -23,7 +23,7 @@ namespace OfBot.Components.DotaTracker
             this.dotaApi = dotaApi;
             this.openDotaApi = openDotaApi;
         }
-        public async Task Add(string accountId, string addedBy)
+        public async Task<TrackedDotaPlayer> Add(string accountId, string addedBy)
         {
             var player = await this.Exists(accountId);
             if (player != null)
@@ -50,8 +50,9 @@ namespace OfBot.Components.DotaTracker
                 latestMatchId = null,
                 player = trackedPlayer
             });
+            return trackedPlayer; 
         }
-        public async Task Remove(string accountId)
+        public async Task<TrackedDotaPlayer> Remove(string accountId)
         {
             var player = await this.Exists(accountId);
             if (player == null)
@@ -60,6 +61,7 @@ namespace OfBot.Components.DotaTracker
             }
             await this.tableService.Delete(player);
             this.players.Remove(this.players.FirstOrDefault(state => state.player.AccountId == accountId));
+            return player;
         }
         private async Task<TrackedDotaPlayer> Exists(string accountId)
         {
