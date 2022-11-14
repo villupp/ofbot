@@ -1,21 +1,23 @@
 using OfBot.TableStorage.Models;
 using OfBot.TableStorage;
-using Microsoft.Extensions.Logging;
+using OfBot.Components.Api;
 
-namespace OfBot
+namespace OfBot.Components.DotaTracker
 {
     public class TrackedDotaPlayers
     {
-
-        private List<TrackedDotaPlayer> trackedPlayers { get; set; }
+        public List<TrackingState<TrackedDotaPlayer>> players { get; set; }
         private TableStorageService<TrackedDotaPlayer> tableService;
+        private DotaApi dotaApi;
 
         public TrackedDotaPlayers(
-            TableStorageService<TrackedDotaPlayer> commandTableService
+            TableStorageService<TrackedDotaPlayer> commandTableService,
+            DotaApi dotaApi
         )
         {
-            this.trackedPlayers = new List<TrackedDotaPlayer>();
+            this.players = new List<TrackingState<TrackedDotaPlayer>>();
             this.tableService = commandTableService;
+            this.dotaApi = dotaApi;
         }
         public async Task Add(string accountId, string addedBy)
         {
@@ -24,14 +26,23 @@ namespace OfBot
             {
                 throw new Exception($"Dota player {accountId} is already tracked");
             }
-            await tableService.Add(new TrackedDotaPlayer()
+            var validationState = await Validate(accountId);
+            if (validationState.isValid == false) {
+                throw new Exception($"Could not track player: {validationState.errorMessage}");
+            } 
+            var trackedPlayer = new TrackedDotaPlayer()
             {
                 RowKey = Guid.NewGuid().ToString(),
                 PartitionKey = "",
                 AccountId = accountId,
                 AddedBy = addedBy
+            };
+            await tableService.Add(trackedPlayer);
+            this.players.Add(new TrackingState<TrackedDotaPlayer>()
+            {
+                latestMatchId = null,
+                player = trackedPlayer
             });
-            await this.Refresh();
         }
         public async Task Remove(string accountId)
         {
@@ -41,7 +52,7 @@ namespace OfBot
                 throw new Exception($"Could not find tracked dota player with id {accountId}");
             }
             await this.tableService.Delete(player);
-            await this.Refresh();
+            this.players.Remove(this.players.FirstOrDefault(state => state.player.AccountId == accountId));
         }
         private async Task<TrackedDotaPlayer> Exists(string accountId)
         {
@@ -55,13 +66,28 @@ namespace OfBot
         }
         public async Task Refresh()
         {
-            this.trackedPlayers = await tableService.Get(trackedDotaPlayer => true);
-            this.trackedPlayers.Sort(
-                (x,y) => Nullable.Compare(x.Timestamp, y.Timestamp));
+            var players = await tableService.Get(trackedDotaPlayer => true);
+            this.players.Clear();
+            foreach (var player in players)
+            {
+                this.players.Add(new TrackingState<TrackedDotaPlayer>
+                {
+                    player = player,
+                    latestMatchId = null
+                });
+            }
+            this.players.Sort(
+                (x, y) => Nullable.Compare(x.player.Timestamp, y.player.Timestamp));
         }
-        public List<TrackedDotaPlayer> Get()
-        {
-            return this.trackedPlayers;
+
+        private async Task<(bool isValid, string errorMessage)> Validate(string accountId) {
+            var response = await dotaApi.GetRecentDotaMatches(accountId, 1);
+            if (response == null) {
+                return (false, $"Couldn't validate account id {accountId}, Steam API might be down");
+            } else if (response.result.status != 1) {
+                return (false, $"Account id {accountId} match history is not exposed");
+            }
+            return (true, null);
         }
     }
 }

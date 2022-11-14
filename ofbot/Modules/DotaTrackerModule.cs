@@ -1,5 +1,7 @@
 using Discord.Commands;
+using OfBot.Components.DotaTracker;
 using Microsoft.Extensions.Logging;
+using System.Text.RegularExpressions;
 
 namespace OfBot.Modules
 {
@@ -8,14 +10,14 @@ namespace OfBot.Modules
     public class DotaTrackerModule : ModuleBase<SocketCommandContext>
     {
         private ILogger logger;
-        private TrackedDotaPlayers trackedPlayers;
+        private TrackedDotaPlayers playerStates;
         public DotaTrackerModule(
             ILogger<DotaTrackerModule> logger,
-            TrackedDotaPlayers trackedPlayers
+            TrackedDotaPlayers playerStates
             )
         {
             this.logger = logger;
-            this.trackedPlayers = trackedPlayers;
+            this.playerStates = playerStates;
         }
 
         // Replies with help for dotatracker component
@@ -27,7 +29,10 @@ namespace OfBot.Modules
         {
             logger.LogInformation($"Dotatracker help initiated by {Context.User.Username}");
 
-            await Context.Channel.SendMessageAsync("Use `-dotatracker track <accountId>` to track a new player.\nUse `-dotatracker remove <accountId>` to remove a tracked player.");
+            await Context.Channel.SendMessageAsync(
+                "Use `-dotatracker track <accountId>` to track a new player.\n" +
+                "Use `-dotatracker remove <accountId>` to remove a tracked player.\n" +
+                "Use `-dotatracker list` to list existing tracked players.");
         }
 
         // Track a new dota player
@@ -38,15 +43,23 @@ namespace OfBot.Modules
         public async Task Track(
             [Remainder][Summary("Dota player account id")] string accountId)
         {
-            logger.LogInformation($"Dotatracker track command initiated by {Context.User.Username}");
-            try
+            var initiatedBy = $"{Context.User.Username}#{Context.User.Discriminator}";
+            logger.LogInformation($"Dotatracker track command initiated by {initiatedBy}");
+            if (!Regex.IsMatch(accountId, "^\\d+$"))
             {
-                await trackedPlayers.Add(accountId, Context.User.Username);
-                await Context.Channel.SendMessageAsync($"Tracking dota player {accountId}");
+                await Context.Channel.SendMessageAsync("Please provide a valid Dota account id");
             }
-            catch (Exception e)
+            else
             {
-                await Context.Channel.SendMessageAsync($"Could not track player {accountId}: " + e.Message);
+                try
+                {
+                    await playerStates.Add(accountId, initiatedBy);
+                    await Context.Channel.SendMessageAsync($"Tracking dota player {accountId}");
+                }
+                catch (Exception e)
+                {
+                    await Context.Channel.SendMessageAsync(e.Message);
+                }
             }
         }
 
@@ -62,12 +75,12 @@ namespace OfBot.Modules
             logger.LogInformation($"Dotatracker untrack command initiated by {Context.User.Username}");
             try
             {
-                await trackedPlayers.Remove(accountId);
-                await Context.Channel.SendMessageAsync($"Removing tracked dota player {accountId}");
+                await playerStates.Remove(accountId);
+                await Context.Channel.SendMessageAsync($"Removed tracked dota player {accountId}");
             }
             catch (Exception e)
             {
-                await Context.Channel.SendMessageAsync($"Could remove tracked player {accountId}: " + e.Message);
+                await Context.Channel.SendMessageAsync($"Could not remove tracked player {accountId}: " + e.Message);
             }
         }
 
@@ -81,7 +94,7 @@ namespace OfBot.Modules
             logger.LogInformation($"Dotatracker tracked players list command initiated by {Context.User.Username}");
             try
             {
-                var players = trackedPlayers.Get().Select(player => $"{player.AccountId} (Added by {player.AddedBy})");
+                var players = playerStates.players.Select(state => $"{state.player.AccountId} (Added by {state.player.AddedBy})");
                 if (players.ToList().Count > 0)
                 {
                     await Context.Channel.SendMessageAsync($"Currently tracked dota players:\n{String.Join("\n", players)}");
@@ -93,7 +106,7 @@ namespace OfBot.Modules
             }
             catch (Exception e)
             {
-                await Context.Channel.SendMessageAsync($"Could get tracked players: " + e.Message);
+                await Context.Channel.SendMessageAsync($"Could not get tracked players: " + e.Message);
             }
         }
     }

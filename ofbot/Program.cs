@@ -9,6 +9,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OfBot.CommandHandlers;
 using OfBot.Components;
+using OfBot.Components.DotaTracker;
+using OfBot.Components.Api;
 using OfBot.TableStorage;
 using OfBot.TableStorage.Models;
 
@@ -62,7 +64,7 @@ namespace OfBot
                 services.AddSingleton<TrackedDotaPlayers>();
 
                 // Add steam dota 2 api http client
-                services.AddHttpClient<SteamApi>(client =>
+                services.AddHttpClient<DotaApi>(client =>
                 {
                     client.BaseAddress = new Uri("https://api.steampowered.com");
                 });
