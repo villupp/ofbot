@@ -10,7 +10,7 @@ namespace OfBot.DotaTracker
         private readonly DotaApiClient dotaApiClient;
         private readonly TrackedDotaPlayers trackedPlayers;
         private readonly BotSettings botSettings;
-        private Dictionary<long, List<string>> announceGames; // long = gameid, List<string> = names of tracked players
+        private Dictionary<long, List<string>> announceGamesAndPlayers; // long = gameid, List<string> = names of tracked players
 
         public DotaPoller(
             ILogger<DotaPoller> logger,
@@ -43,7 +43,7 @@ namespace OfBot.DotaTracker
 
         private async Task AnnounceRecentMatches()
         {
-            announceGames = new Dictionary<long, List<string>>();
+            announceGamesAndPlayers = new Dictionary<long, List<string>>();
 
             foreach (var playerState in trackedPlayers.players)
             {
@@ -61,20 +61,27 @@ namespace OfBot.DotaTracker
                     // Recent match id has changed -> add player and game to announced games
                     playerState.latestMatchId = recentMatch.match_id;
 
-                    if (!announceGames.ContainsKey(recentMatch.match_id))
-                        announceGames.Add(recentMatch.match_id, new List<string>() { playerState.player.SteamName });
-                    else
-                        announceGames[recentMatch.match_id].Add(playerState.player.SteamName);
+                    if (!announceGamesAndPlayers.ContainsKey(recentMatch.match_id))
+                        announceGamesAndPlayers.Add(recentMatch.match_id, new List<string>());
+                    
+                    announceGamesAndPlayers[recentMatch.match_id].Add(playerState.player.SteamName);
                 }
             }
 
-            foreach (var game in announceGames)
+            logger.LogInformation($"Announcing {announceGamesAndPlayers?.Count} games");
+            
+            foreach (var gameAndPlayers in announceGamesAndPlayers)
             {
-                var playersStr = "";
-                var gameStr = $"<https://www.opendota.com/matches/{game.Key}>";
+                var gameId = gameAndPlayers.Key;
+                var players = gameAndPlayers.Value;
 
-                foreach (var player in game.Value)
-                    playersStr += $"{player}, ";
+                logger.LogInformation($"Announcing game ID {gameId}, players ({players?.Count}): {string.Join(',', players)}");
+
+                var playersStr = "";
+                var gameLinkStr = $"<https://www.opendota.com/matches/{gameId}> <https://www.dotabuff.com/matches/{gameId}>";
+
+                foreach (var playerName in players)
+                    playersStr += $"{playerName}, ";
 
                 // remove last ", "
                 playersStr = playersStr.Substring(playersStr.Length - 2, 2);
@@ -82,7 +89,7 @@ namespace OfBot.DotaTracker
                 await announcementService.Announce(
                     botSettings.DotaTrackerAnnouncementGuild,
                     botSettings.DotaTrackerAnnouncementChannel,
-                    $"{playersStr} played a match of dota: {gameStr}"
+                    $"{playersStr} played a match of dota: {gameLinkStr}"
                 );
             }
         }
