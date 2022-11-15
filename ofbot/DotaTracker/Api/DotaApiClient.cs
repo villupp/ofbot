@@ -27,5 +27,12 @@ namespace OfBot.Api.Dota
             var response = await httpClient.GetFromJsonAsync<GetMatchDetailsResponse>(path);
             return response;
         }
+
+        public async Task<Match> GetMostRecentDotaMatch(string accountId)
+        {
+            var res = await GetRecentDotaMatches(accountId, 1);
+
+            return res.result.matches.FirstOrDefault();
+        }
     }
 }

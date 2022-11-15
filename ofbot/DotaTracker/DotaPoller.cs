@@ -7,9 +7,10 @@ namespace OfBot.DotaTracker
     {
         private readonly ILogger<DotaPoller> logger;
         private readonly AnnouncementService announcementService;
-        private readonly DotaApiClient dotaApi;
+        private readonly DotaApiClient dotaApiClient;
         private readonly TrackedDotaPlayers trackedPlayers;
         private readonly BotSettings botSettings;
+        private Dictionary<long, List<string>> announceGames; // long = gameid, List<string> = names of tracked players
 
         public DotaPoller(
             ILogger<DotaPoller> logger,
@@ -21,10 +22,11 @@ namespace OfBot.DotaTracker
         {
             this.logger = logger;
             this.announcementService = announcementService;
-            this.dotaApi = dotaApi;
+            this.dotaApiClient = dotaApi;
             this.trackedPlayers = trackedPlayers;
             this.botSettings = botSettings;
         }
+
         public async Task Start()
         {
             logger.LogInformation("Initializing tracked players list");
@@ -35,51 +37,53 @@ namespace OfBot.DotaTracker
             do
             {
                 logger.LogInformation("Polling for recent dota matches of tracked players");
-                await PollRecentMatches();
+                await AnnounceRecentMatches();
             } while (await timer.WaitForNextTickAsync());
-
         }
 
-        private async Task PollRecentMatches()
+        private async Task AnnounceRecentMatches()
         {
+            announceGames = new Dictionary<long, List<string>>();
+
             foreach (var playerState in trackedPlayers.players)
             {
-                try
-                {
-                    var response = await dotaApi.GetRecentDotaMatches(playerState.player.AccountId, 1);
-                    // Make sure response is valid
-                    if (
-                        response != null &&
-                        response.result.status == 1 &&
-                        response.result != null &&
-                        response.result.num_results > 0
-                    )
-                    {
-                        /* Latest match id is always initially null, initial update (from null to a valid match id) will
+                var recentMatch = await dotaApiClient.GetMostRecentDotaMatch(playerState.player.AccountId);
+
+                /* Latest match id is always initially null, initial update (from null to a valid match id) will
                            not trigger an announcement. An announcement about a new detected match is made when the latest
                            match id changes during runtime. */
-                        var recentMatchId = response.result.matches[0].match_id;
-                        if (playerState.latestMatchId == null)
-                        {
-                            playerState.latestMatchId = recentMatchId;
-                        }
-                        else if (playerState.latestMatchId != recentMatchId)
-                        {
-                            // Recent match id has changed -> announce
-                            playerState.latestMatchId = recentMatchId;
-                            await announcementService.Announce(
-                                botSettings.DotaTrackerAnnouncementGuild,
-                                botSettings.DotaTrackerAnnouncementChannel,
-                                $"{playerState.player.SteamName} played a match of dota\n<https://www.opendota.com/matches/{recentMatchId}>"
-                            );
-                        }
-                    }
-                }
-                catch (Exception e)
+                if (playerState.latestMatchId == null)
                 {
-                    logger.LogError($"Failed getting recent matches for account {playerState.player.AccountId}: {e.Message}");
+                    playerState.latestMatchId = recentMatch.match_id;
                 }
+                else if (playerState.latestMatchId != recentMatch.match_id)
+                {
+                    // Recent match id has changed -> add player and game to announced games
+                    playerState.latestMatchId = recentMatch.match_id;
 
+                    if (!announceGames.ContainsKey(recentMatch.match_id))
+                        announceGames.Add(recentMatch.match_id, new List<string>() { playerState.player.SteamName });
+                    else
+                        announceGames[recentMatch.match_id].Add(playerState.player.SteamName);
+                }
+            }
+
+            foreach (var game in announceGames)
+            {
+                var playersStr = "";
+                var gameStr = $"<https://www.opendota.com/matches/{game.Key}>";
+
+                foreach (var player in game.Value)
+                    playersStr += $"{player}, ";
+
+                // remove last ", "
+                playersStr = playersStr.Substring(playersStr.Length - 2, 2);
+
+                await announcementService.Announce(
+                    botSettings.DotaTrackerAnnouncementGuild,
+                    botSettings.DotaTrackerAnnouncementChannel,
+                    $"{playersStr} played a match of dota: {gameStr}"
+                );
             }
         }
     }
