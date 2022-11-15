@@ -87,7 +87,7 @@ namespace OfBot.DotaTracker
                     playersStr += $"{playerName}, ";
 
                 // remove last ", "
-                playersStr = playersStr.Substring(playersStr.Length - 2, 2);
+                playersStr = playersStr.Substring(0, playersStr.Length - 2);
 
                 await announcementService.Announce(
                     botSettings.DotaTrackerAnnouncementGuild,
