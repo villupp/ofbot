@@ -68,6 +68,9 @@ namespace OfBot.DotaTracker
                 }
             }
 
+            if (announceGamesAndPlayers?.Count == 0)
+                return;
+
             logger.LogInformation($"Announcing {announceGamesAndPlayers?.Count} games");
             
             foreach (var gameAndPlayers in announceGamesAndPlayers)
