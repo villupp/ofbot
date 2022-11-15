@@ -32,7 +32,7 @@ namespace OfBot.Api.Dota
         {
             var res = await GetRecentDotaMatches(accountId, 1);
 
-            return res.result.matches.FirstOrDefault();
+            return res?.result?.matches?.FirstOrDefault();
         }
     }
 }
