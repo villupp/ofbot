@@ -36,7 +36,7 @@ namespace OfBot.DotaTracker
             logger.LogInformation("DotaTracker polling service started");
             do
             {
-                logger.LogInformation("Polling for recent dota matches of tracked players");
+                logger.LogDebug("Polling for recent dota matches of tracked players");
                 await AnnounceRecentMatches();
             } while (await timer.WaitForNextTickAsync());
         }
