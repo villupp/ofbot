@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using OfBot.Api.Dota;
+using Discord;
 
 namespace OfBot.DotaTracker
 {
@@ -10,7 +11,7 @@ namespace OfBot.DotaTracker
         private readonly DotaApiClient dotaApiClient;
         private readonly TrackedDotaPlayers trackedPlayers;
         private readonly BotSettings botSettings;
-        
+
         public DotaPoller(
             ILogger<DotaPoller> logger,
             AnnouncementService announcementService,
@@ -68,24 +69,19 @@ namespace OfBot.DotaTracker
 
                     // Make announcement for all tracked players in the match
                     var playerNames = includedPlayers.Select(p => p.player.SteamName).ToList();
-                    AnnounceMatch(recentMatch.match_id.ToString(), playerNames);
+                    logger.LogInformation($"Announcing game ID {recentMatch.match_id}, players ({playerNames?.Count}): {string.Join(",", playerNames)}");
+                    var response = await dotaApiClient.GetMatchDetails(recentMatch.match_id);
+                    var playerIdList = includedPlayers.Select(p => Int64.Parse(p.player.AccountId)).ToList();
+                    var matchDetails = new AnnouncedMatchDetails(response, playerIdList, playerNames);
+                    await announcementService.Announce(
+                        botSettings.DotaTrackerAnnouncementGuild,
+                        botSettings.DotaTrackerAnnouncementChannel,
+                        matchDetails.BuildEmbed()
+                    );
                 }
             }
         }
 
-        private async void AnnounceMatch(string matchId, List<string> players)
-        {
-            logger.LogInformation($"Announcing game ID {matchId}, players ({players?.Count}): {string.Join(",", players)}");
 
-            var playerNames = String.Join(", ", players.SkipLast(1));
-            playerNames += players.Count > 1 ? $" and {players.Last()}" : players.Last();
-            var gameLink = $"\n<https://www.opendota.com/matches/{matchId}>\n<https://www.dotabuff.com/matches/{matchId}>";
-            
-            await announcementService.Announce(
-                botSettings.DotaTrackerAnnouncementGuild,
-                botSettings.DotaTrackerAnnouncementChannel,
-                $"{playerNames} played a match of dota: {gameLink}"
-            );
-        }
     }
 }
