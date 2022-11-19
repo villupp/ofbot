@@ -1,20 +1,18 @@
 namespace OfBot.Api.Dota
 {
     public class GetMatchDetailsResponse {
-        public MatchSearchResult result { get; set; }
+        public MatchDetailsResult result { get; set; }
     }
-    public class MatchSearchResult {
-        public Int64 status { get; set; }
-        public Int64 num_results { get; set; }
-        public Match[] matches { get; set; }
-    }
-    public class Match {
+    public class MatchDetailsResult {
         public Int64 match_id { get; set; }
-        public Int64 start_time { get; set; }
-        public Int64 lobby_type { get; set; }
-        public Player[] players { get; set; }
+        public bool radiant_win { get; set; }
+        public int duration { get; set; }
+        public int radiant_score { get; set; }
+        public int dire_score { get; set; }
+        public MatchDetailsPlayer[] players { get; set; }
     }
-    public class Player {
+    public class MatchDetailsPlayer {
         public Int64 account_id { get; set; }
+        public int player_slot { get; set; }
     }
 }
