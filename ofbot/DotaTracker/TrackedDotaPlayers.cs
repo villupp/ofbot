@@ -109,26 +109,23 @@ namespace OfBot.DotaTracker
             return (openDotaPlayer.profile.personaname, null);
         }
 
-        public async void UpdatePersonaName(Int64 accountId, string newPersonaName)
+        // Return false if update is not done
+        public async Task<bool> UpdateSteamName(Int64 accountId, string newPersonaName)
         {
-
             var state = GetPlayerByAccountId(accountId);
             if (state.player.SteamName == newPersonaName)
             {
-                return; // Persona name has not been updated
+                return false; // Persona name has not been updated
             }
 
             // Update local
             state.player.SteamName = newPersonaName;
 
             // Update db
-            var players = await tableService.Get(
-                p => p.AccountId == accountId.ToString());
-            if (players[0].SteamName != newPersonaName)
-            {
-                players[0].SteamName = newPersonaName;
-                await tableService.Update(players[0]);
-            }
+            var players = await tableService.Get(p => p.AccountId == accountId.ToString());
+            players[0].SteamName = newPersonaName;
+            await tableService.Update(players[0]);
+            return true;
         }
 
         public TrackingState<TrackedDotaPlayer> GetPlayerByAccountId(Int64 accountId)
@@ -138,6 +135,6 @@ namespace OfBot.DotaTracker
         public TrackingState<TrackedDotaPlayer> GetPlayerByAccountId(String accountId)
         {
             return this.trackingStates.FirstOrDefault(p => p.player.AccountId == accountId);
-        } 
+        }
     }
 }

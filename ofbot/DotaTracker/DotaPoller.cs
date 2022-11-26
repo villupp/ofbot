@@ -56,26 +56,35 @@ namespace OfBot.DotaTracker
                 }
                 else if (playerState.latestMatchId != recentMatch.match_id)
                 {
+                    logger.LogInformation($"Detected new match for tracked player ID {playerState.player.AccountId} ({playerState.player.SteamName})");
+                    logger.LogInformation($"Updating recent match id to {recentMatch.match_id} from {playerState.latestMatchId}");
+
                     // Recent match id has changed
                     playerState.latestMatchId = recentMatch.match_id;
+
 
                     // Update state of each included player in the match to avoid duplicate announcements for each game
                     var includedPlayers = trackedPlayers.trackingStates.Where(
                         trackedPlayer => recentMatch.players.Any(p => p.account_id.ToString() == trackedPlayer.player.AccountId));
-                    foreach (var player in includedPlayers)
+
+                    logger.LogInformation($"Updating latest match id of {includedPlayers.ToList().Count} included tracked players");
+
+                    foreach (var state in includedPlayers)
                     {
-                        player.latestMatchId = recentMatch.match_id;
+                        logger.LogInformation($"Updating latest match id of {state.player.AccountId} ({state.player.SteamName}) from {state.latestMatchId} to {recentMatch.match_id}");
+                        state.latestMatchId = recentMatch.match_id;
                     }
 
                     // Make announcement for all tracked players in the match
                     var playerNames = includedPlayers.Select(p => p.player.SteamName).ToList();
                     logger.LogInformation($"Announcing game ID {recentMatch.match_id}, players ({playerNames?.Count}): {string.Join(",", playerNames)}");
-                    
+
                     var response = await dotaApiClient.GetMatchDetails(recentMatch.match_id);
-                    
+
                     // Update persona names of players included in the match (match response includes personaName)
-                    UpdatePersonaNames(includedPlayers.ToList(), response);
-                    
+                    logger.LogInformation($"Updating personaNames (steamNames) of included players");
+                    await UpdatePersonaNames(includedPlayers.ToList(), response);
+
                     var playerIdList = includedPlayers.Select(p => Int64.Parse(p.player.AccountId)).ToList();
                     var matchDetails = new AnnouncedMatchDetails(response, playerIdList, playerNames);
                     await announcementService.Announce(
@@ -86,14 +95,18 @@ namespace OfBot.DotaTracker
                 }
             }
         }
-        private void UpdatePersonaNames(List<TrackingState<TrackedDotaPlayer>> states, GetMatchDetailsResponse recentMatch)
+
+        private async Task UpdatePersonaNames(List<TrackingState<TrackedDotaPlayer>> states, GetMatchDetailsResponse recentMatch)
         {
             foreach (var state in states)
             {
                 var player = recentMatch.result.players.FirstOrDefault(p => p.account_id.ToString() == state.player.AccountId);
-                trackedPlayers.UpdatePersonaName(player.account_id, player.personaName);
+                var updated = await trackedPlayers.UpdateSteamName(player.account_id, player.personaName);
+                if (updated)
+                {
+                    logger.LogInformation($"Tracked player {state.player.AccountId} steamName was updated to {state.player.SteamName}");
+                }
             }
         }
-
     }
 }
