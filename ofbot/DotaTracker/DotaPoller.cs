@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 using OfBot.Api.Dota;
-using Discord;
+using OfBot.TableStorage.Models;
 
 namespace OfBot.DotaTracker
 {
@@ -43,7 +43,7 @@ namespace OfBot.DotaTracker
 
         private async Task AnnounceRecentMatches()
         {
-            foreach (var playerState in trackedPlayers.players)
+            foreach (var playerState in trackedPlayers.trackingStates)
             {
                 var recentMatch = await dotaApiClient.GetMostRecentDotaMatch(playerState.player.AccountId);
 
@@ -60,7 +60,7 @@ namespace OfBot.DotaTracker
                     playerState.latestMatchId = recentMatch.match_id;
 
                     // Update state of each included player in the match to avoid duplicate announcements for each game
-                    var includedPlayers = trackedPlayers.players.Where(
+                    var includedPlayers = trackedPlayers.trackingStates.Where(
                         trackedPlayer => recentMatch.players.Any(p => p.account_id.ToString() == trackedPlayer.player.AccountId));
                     foreach (var player in includedPlayers)
                     {
@@ -70,7 +70,12 @@ namespace OfBot.DotaTracker
                     // Make announcement for all tracked players in the match
                     var playerNames = includedPlayers.Select(p => p.player.SteamName).ToList();
                     logger.LogInformation($"Announcing game ID {recentMatch.match_id}, players ({playerNames?.Count}): {string.Join(",", playerNames)}");
+                    
                     var response = await dotaApiClient.GetMatchDetails(recentMatch.match_id);
+                    
+                    // Update persona names of players included in the match (match response includes personaName)
+                    UpdatePersonaNames(includedPlayers.ToList(), response);
+                    
                     var playerIdList = includedPlayers.Select(p => Int64.Parse(p.player.AccountId)).ToList();
                     var matchDetails = new AnnouncedMatchDetails(response, playerIdList, playerNames);
                     await announcementService.Announce(
@@ -81,7 +86,14 @@ namespace OfBot.DotaTracker
                 }
             }
         }
-
+        private void UpdatePersonaNames(List<TrackingState<TrackedDotaPlayer>> states, GetMatchDetailsResponse recentMatch)
+        {
+            foreach (var state in states)
+            {
+                var player = recentMatch.result.players.FirstOrDefault(p => p.account_id.ToString() == state.player.AccountId);
+                trackedPlayers.UpdatePersonaName(player.account_id, player.personaName);
+            }
+        }
 
     }
 }

@@ -33,7 +33,8 @@ namespace OfBot.Api.Dota
             var endpoint = "/IDOTA2Match_570/GetMatchDetails/v1";
             string[] pathParams = new string[] {
                 $"key={botSettings.SteamApiKey}",
-                $"match_id={matchId}"
+                $"match_id={matchId}",
+                "include_persona_names=1"
             };
             var pathParamsText = String.Join("&", pathParams);
             string path = $"{endpoint}?{pathParamsText}";
