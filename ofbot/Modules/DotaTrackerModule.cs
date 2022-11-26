@@ -94,7 +94,7 @@ namespace OfBot.Modules
             logger.LogInformation($"Dotatracker tracked players list command initiated by {Context.User.Username}");
             try
             {
-                var players = playerStates.players.Select(state => $"{state.player.SteamName} [{state.player.AccountId}] added by {state.player.AddedBy}");
+                var players = playerStates.trackingStates.Select(state => $"{state.player.SteamName} [{state.player.AccountId}] added by {state.player.AddedBy}");
                 if (players.ToList().Count > 0)
                 {
                     await Context.Channel.SendMessageAsync($"Currently tracked dota players:\n{String.Join("\n", players)}");
