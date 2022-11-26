@@ -15,6 +15,9 @@ namespace OfBot.TableStorage
         {
             this.logger = logger;
             tableClient = tableServiceClient.GetTableClient(typeof(T).Name);
+            // Create TableStorage tables if they do not exist
+            tableServiceClient.CreateTableIfNotExists("trackedDotaPlayer");
+            tableServiceClient.CreateTableIfNotExists("command");
         }
 
         public async Task<List<T>> Get(Expression<Func<T, bool>> query)

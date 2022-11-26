@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OfBot.Components;
+using OfBot.DotaTracker;
 using System.Reflection;
 
 namespace OfBot
@@ -18,6 +19,7 @@ namespace OfBot
         private readonly CommandService commandService;
         private readonly IServiceProvider serviceProvider;
         private readonly ButtonHandler buttonHandler;
+        private readonly DotaPoller dotaPoller;
 
         private static readonly Dictionary<string, string> allGlobalCommands = new()
         {
@@ -33,7 +35,8 @@ namespace OfBot
             DiscordSocketClient discordSocketClient,
             CommandService commandService,
             IServiceProvider serviceProvider,
-            ButtonHandler buttonHandler
+            ButtonHandler buttonHandler,
+            DotaPoller dotaPoller
             )
         {
             appLifetime.ApplicationStarted.Register(OnStarted);
@@ -46,6 +49,7 @@ namespace OfBot
             this.commandService = commandService;
             this.serviceProvider = serviceProvider;
             this.buttonHandler = buttonHandler;
+            this.dotaPoller = dotaPoller;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -93,6 +97,12 @@ namespace OfBot
                     var globalCommand = new SlashCommandBuilder();
                     globalCommand.WithName(command.Key);
                     globalCommand.WithDescription(command.Value);
+            discordSocketClient.Ready += async () =>
+            {
+                logger.LogInformation("Bot is connected and ready");
+                logger.LogInformation("Starting dota tracker polling service");
+                await dotaPoller.Start(); // Start the dota tracker poller
+            };
 
                     await discordClient.CreateGlobalApplicationCommandAsync(globalCommand.Build());
                 }
