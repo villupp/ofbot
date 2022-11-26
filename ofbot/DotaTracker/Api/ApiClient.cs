@@ -21,7 +21,7 @@ namespace OfBot.Api
         protected async void LogHttpFailure(HttpResponseMessage response)
         {
             var content = await response.Content.ReadAsStringAsync();
-            logger.LogInformation(
+            logger.LogError(
                 $"Http request {response.RequestMessage.Method.Method} {response.RequestMessage.RequestUri} " +
                 $"returned status {response.StatusCode} with response content: {content}"
             );
