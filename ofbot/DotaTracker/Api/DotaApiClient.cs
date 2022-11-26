@@ -34,7 +34,7 @@ namespace OfBot.Api.Dota
             }
         }
 
-        public async Task<GetMatchDetailsResponse> GetMatchDetails(long matchId)
+        public async Task<GetMatchDetailsResponse> GetMatchDetails(Int64 matchId)
         {
             var endpoint = "/IDOTA2Match_570/GetMatchDetails/v1";
             string[] pathParams = new string[] {

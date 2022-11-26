@@ -10,18 +10,18 @@ namespace OfBot.DotaTracker
     }
     public class AnnouncedMatchDetails
     {
-        private long matchId;
+        private Int64 matchId;
         private Team winner;
         private int scoreRadiant;
         private int scoreDire;
         private Team announcedPlayerTeam;
         private TimeSpan gameLength;
-        private List<long> announcedPlayerIds;
+        private List<Int64> announcedPlayerIds;
         private List<string> announcedPlayerNames;
 
         public AnnouncedMatchDetails(
             GetMatchDetailsResponse response,
-            List<long> announcedPlayerIds,
+            List<Int64> announcedPlayerIds,
             List<string> announcedPlayerNames
         )
         {

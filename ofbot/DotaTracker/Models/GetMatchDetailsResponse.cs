@@ -4,7 +4,7 @@ namespace OfBot.Api.Dota
         public MatchDetailsResult result { get; set; }
     }
     public class MatchDetailsResult {
-        public long match_id { get; set; }
+        public Int64 match_id { get; set; }
         public bool radiant_win { get; set; }
         public int duration { get; set; }
         public int radiant_score { get; set; }
@@ -12,7 +12,7 @@ namespace OfBot.Api.Dota
         public MatchDetailsPlayer[] players { get; set; }
     }
     public class MatchDetailsPlayer {
-        public long account_id { get; set; }
+        public Int64 account_id { get; set; }
         public int player_slot { get; set; }
         public string persona { get; set; }
     }

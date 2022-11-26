@@ -93,7 +93,7 @@ namespace OfBot.DotaTracker
                     logger.LogInformation($"Updating personaNames (steamNames) of included players");
                     await UpdatePersonaNames(includedPlayers.ToList(), response);
 
-                    var playerIdList = includedPlayers.Select(p => long.Parse(p.player.AccountId)).ToList();
+                    var playerIdList = includedPlayers.Select(p => Int64.Parse(p.player.AccountId)).ToList();
                     var matchDetails = new AnnouncedMatchDetails(response, playerIdList, playerNames);
                     await announcementService.Announce(
                         botSettings.DotaTrackerAnnouncementGuild,
