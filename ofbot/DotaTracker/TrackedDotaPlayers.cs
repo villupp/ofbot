@@ -110,7 +110,7 @@ namespace OfBot.DotaTracker
         }
 
         // Return false if update is not done
-        public async Task<bool> UpdateSteamName(Int64 accountId, string newPersonaName)
+        public async Task<bool> UpdateSteamName(long accountId, string newPersonaName)
         {
             var state = GetPlayerByAccountId(accountId);
             if (state.player.SteamName == newPersonaName)
@@ -128,7 +128,7 @@ namespace OfBot.DotaTracker
             return true;
         }
 
-        public TrackingState<TrackedDotaPlayer> GetPlayerByAccountId(Int64 accountId)
+        public TrackingState<TrackedDotaPlayer> GetPlayerByAccountId(long accountId)
         {
             return GetPlayerByAccountId(accountId.ToString());
         }
