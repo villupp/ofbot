@@ -1,25 +1,28 @@
 using System.Net.Http.Json;
+using Microsoft.Extensions.Logging;
 
 namespace OfBot.Api.OpenDota
 {
-    public class OpenDotaApiClient
+    public class OpenDotaApiClient : ApiClient
     {
-        private readonly BotSettings botSettings;
-        private readonly HttpClient httpClient;
-
-        public OpenDotaApiClient(
-            BotSettings botSettings,
-            HttpClient httpClient
-        )
+        public OpenDotaApiClient(ILogger<ApiClient> logger, BotSettings botSettings, HttpClient httpClient) : base(logger, botSettings, httpClient)
         {
-            this.botSettings = botSettings;
-            this.httpClient = httpClient;
         }
+
         public async Task<GetPlayerResponse> GetPlayer(string accountId)
         {
-            var endpoint = $"/api/players/{accountId}";
-            var response = await httpClient.GetFromJsonAsync<GetPlayerResponse>(endpoint);
-            return response;
+            var path = $"/api/players/{accountId}";
+            var httpResponse = await httpClient.GetAsync(path);
+            if (httpResponse.IsSuccessStatusCode)
+            {
+                var getPlayerResponse = await httpResponse.Content.ReadFromJsonAsync<GetPlayerResponse>();
+                return getPlayerResponse;
+            }
+            else
+            {
+                this.LogHttpFailure(httpResponse); ;
+                throw new HttpRequestException();
+            }
         }
     }
 }

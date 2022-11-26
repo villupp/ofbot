@@ -14,6 +14,6 @@ namespace OfBot.Api.Dota
     public class MatchDetailsPlayer {
         public Int64 account_id { get; set; }
         public int player_slot { get; set; }
-        public string personaName { get; set; }
+        public string persona { get; set; }
     }
 }

@@ -132,9 +132,10 @@ namespace OfBot.DotaTracker
         {
             return GetPlayerByAccountId(accountId.ToString());
         }
+
         public TrackingState<TrackedDotaPlayer> GetPlayerByAccountId(String accountId)
         {
-            return this.trackingStates.FirstOrDefault(p => p.player.AccountId == accountId);
+            return this.trackingStates.FirstOrDefault(s => s.player.AccountId == accountId);
         }
     }
 }
