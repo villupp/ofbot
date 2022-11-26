@@ -77,7 +77,10 @@ namespace OfBot
 
             try
             {
+                logger.LogInformation("Installing global commands");
                 await InstallGlobalCommands();
+                logger.LogInformation("Starting dota tracker polling service");
+                await dotaPoller.Start();
             }
             catch (HttpException ex)
             {
@@ -97,12 +100,6 @@ namespace OfBot
                     var globalCommand = new SlashCommandBuilder();
                     globalCommand.WithName(command.Key);
                     globalCommand.WithDescription(command.Value);
-            discordSocketClient.Ready += async () =>
-            {
-                logger.LogInformation("Bot is connected and ready");
-                logger.LogInformation("Starting dota tracker polling service");
-                await dotaPoller.Start(); // Start the dota tracker poller
-            };
 
                     await discordClient.CreateGlobalApplicationCommandAsync(globalCommand.Build());
                 }
