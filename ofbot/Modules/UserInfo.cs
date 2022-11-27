@@ -1,10 +1,10 @@
-﻿using Discord.Commands;
+﻿using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.Logging;
 
 namespace OfBot.Modules
 {
-    public class UserInfo : ModuleBase<SocketCommandContext>
+    public class UserInfo : InteractionModuleBase
     {
         private ILogger logger;
 
@@ -13,25 +13,39 @@ namespace OfBot.Modules
             this.logger = logger;
         }
 
-        // !userinfo --> foxbot#0282
-        // !userinfo @Khionu --> Khionu#8708
-        // !userinfo Khionu#8708 --> Khionu#8708
-        // -userinfo Khionu --> Khionu#8708
-        // -userinfo 96642168176807936 --> Khionu#8708
-        // -whois 96642168176807936 --> Khionu#8708
-        [Command("userinfo")]
-        [Summary
-        ("Returns info about the current user, or the user parameter, if one passed.")]
-        [Alias("user", "whois")]
+        // /userinfo --> foxbot#0282
+        // /userinfo @Khionu --> Khionu#8708
+        // /userinfo Khionu#8708 --> Khionu#8708
+        // /userinfo Khionu --> Khionu#8708
+        // /userinfo 96642168176807936 --> Khionu#8708
+        [SlashCommand("userinfo", "Returns info about the current user, or the user parameter, if one passed.")]
         public async Task PostUserInfo(
             [Summary("The (optional) user to get info from.")]
-        SocketUser user = null)
+            SocketUser user = null)
         {
-            var userInfo = user ?? Context.Client.CurrentUser;
-            logger.LogInformation($"Executing userinfo for user {userInfo.Username} ID {userInfo.Id}");
+            string userName = "";
+            ulong userId = 0;
+            string discriminator = "";
+            DateTimeOffset createdAt = DateTimeOffset.MinValue;
 
-            await ReplyAsync($"{userInfo.Username}#{userInfo.Discriminator}" +
-                $" ID {userInfo.Id} is {userInfo.Status}. Joined on {userInfo.CreatedAt:yyyy-MM-dd HH:mm:ss}");
+            if (user != null) {
+                userName = user.Username;
+                userId = user.Id;
+                discriminator = user.Discriminator;
+                createdAt = user.CreatedAt;
+            }
+            else
+            {
+                userName = Context.Client.CurrentUser.Username;
+                userId = Context.Client.CurrentUser.Id;
+                discriminator = Context.Client.CurrentUser.Discriminator;
+                createdAt = Context.Client.CurrentUser.CreatedAt;
+            }
+
+            logger.LogInformation($"Executing userinfo for user {userName} ID {userId}");
+            
+            await ReplyAsync($"{userName}#{discriminator}" +
+                $" ID {userId}. Joined on {createdAt:yyyy-MM-dd HH:mm:ss}");
         }
     }
 }

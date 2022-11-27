@@ -25,7 +25,7 @@ namespace OfBot
         {
             {"ping", "Get a pong."},
             {"reg", "Create a registration session."},
-            {"ofbot", "Create a registration session."},
+            {"say", "Echoes a message."},
         };
 
         public BotService(
@@ -77,8 +77,8 @@ namespace OfBot
 
             try
             {
-                logger.LogInformation("Installing global commands");
-                await InstallGlobalCommands();
+                //logger.LogInformation("Installing global commands");
+                //await InstallGlobalCommands();
                 logger.LogInformation("Starting dota tracker polling service");
                 await dotaPoller.Start();
             }
@@ -127,7 +127,7 @@ namespace OfBot
 
             var messageHandler = serviceProvider.GetService<MessageHandler>();
             discordClient.MessageReceived += messageHandler.Handle;
-
+            
             await commandService.AddModulesAsync(
                 assembly: Assembly.GetEntryAssembly(),
                 services: serviceProvider);

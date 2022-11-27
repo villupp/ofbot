@@ -1,9 +1,10 @@
 ﻿using Discord.Commands;
+using Discord.Interactions;
 using Microsoft.Extensions.Logging;
 
 namespace OfBot.Modules
 {
-    public class EchoModule : ModuleBase<SocketCommandContext>
+    public class EchoModule : InteractionModuleBase
     {
         private readonly ILogger logger;
 
@@ -12,10 +13,9 @@ namespace OfBot.Modules
             this.logger = logger;
         }
 
-        // !say hello world -> hello world
-        [Command("say")]
-        [Summary("Echoes a message.")]
-        public Task Say([Remainder][Summary("The text to echo")] string echo)
+        // /say hello world -> hello world
+        [SlashCommand("say", "Echoes a message.")]
+        public Task Say([Remainder] string echo)
         {
             logger.LogInformation($"Echo called. Replying: '{echo}'");
             return ReplyAsync(echo);
