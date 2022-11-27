@@ -103,6 +103,8 @@ namespace OfBot.CommandHandlers
 
             var components = modal.Data.Components.ToList();
             var comment = components.First(x => x.CustomId == COMMENT_TEXT_ID).Value;
+            comment = comment.Replace("(", "").Replace(")", ""); // No trolling
+            comment = comment.Replace("`", ""); // No code blocks
 
             var existingInUser = session.InUsers.Where(u => u.Username.ToLower() == userName.ToLower()).FirstOrDefault();
 
