@@ -58,6 +58,7 @@ namespace OfBot
                 services.AddSingleton<TableStorageService<Command>>();
                 services.AddSingleton<RegistrationHandler>();
                 services.AddSingleton<ButtonHandler>();
+                services.AddSingleton<ModalHandler>();
                 services.AddSingleton<AnnouncementService>();
 
                 // DotaTracker

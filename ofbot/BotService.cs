@@ -18,6 +18,7 @@ namespace OfBot
         private readonly CommandService commandService;
         private readonly IServiceProvider serviceProvider;
         private readonly ButtonHandler buttonHandler;
+        private readonly ModalHandler modalHandler;
         private readonly DotaPoller dotaPoller;
 
         public BotService(
@@ -28,6 +29,7 @@ namespace OfBot
             CommandService commandService,
             IServiceProvider serviceProvider,
             ButtonHandler buttonHandler,
+            ModalHandler modalHandler,
             DotaPoller dotaPoller
             )
         {
@@ -41,6 +43,7 @@ namespace OfBot
             this.commandService = commandService;
             this.serviceProvider = serviceProvider;
             this.buttonHandler = buttonHandler;
+            this.modalHandler = modalHandler;
             this.dotaPoller = dotaPoller;
         }
 
@@ -66,6 +69,7 @@ namespace OfBot
             };
 
             discordSocketClient.ButtonExecuted += buttonHandler.OnButtonExecuted;
+            discordSocketClient.ModalSubmitted += modalHandler.OnModalSubmitted;
 
             await InstallCommands();
         }

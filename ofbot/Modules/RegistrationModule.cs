@@ -29,18 +29,23 @@ namespace OfBot.Modules
             logger.LogInformation($"Registration initiated by {Context.User.Username}: {description}");
 
             var registerButtonId = Guid.NewGuid();
+            var commentButtonId = Guid.NewGuid();
             var unregisterButtonId = Guid.NewGuid();
 
             if (string.IsNullOrEmpty(description))
                 description = $"{Context.User.Username}'s event";
             
-            var session = registrationHandler.CreateSession(registerButtonId, unregisterButtonId, description, Context.User.Username);
-
             var builder = new ComponentBuilder()
                 .WithButton("I'm in!", registerButtonId.ToString(), ButtonStyle.Success)
+                .WithButton("I'm in, but..", commentButtonId.ToString(), ButtonStyle.Primary)
                 .WithButton("I'm out..", unregisterButtonId.ToString(), ButtonStyle.Secondary);
 
-            await ReplyAsync(registrationHandler.CreateLineupString(session), components: builder.Build());
+            var component = builder.Build();
+
+            var session = registrationHandler.CreateSession(registerButtonId, unregisterButtonId, commentButtonId, description, Context.User.Username);
+
+            var msg = await ReplyAsync(registrationHandler.CreateLineupString(session), components: component);
+            session.Message = msg;
         }
     }
 }
