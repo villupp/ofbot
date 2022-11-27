@@ -64,6 +64,15 @@ namespace OfBot.DotaTracker
                 else if (playerState.latestMatchId != recentMatch.match_id)
                 {
                     logger.LogInformation($"Detected new match for tracked player ID [{playerState.player.AccountId} {playerState.player.SteamName}]");
+                    /*  Seems like sometimes match history does not update simultaneously for all tracked players
+                        When a new match gets detected with multiple tracked players, make sure recent match id is
+                        greater than player latest match id.
+                    */
+                    if (recentMatch.match_id < playerState.latestMatchId) {
+                        logger.LogInformation($"Detected match id [{recentMatch.match_id}] is older than player latest match id [{playerState.latestMatchId}], skipping");
+                        continue;
+                    }
+                    
                     logger.LogInformation($"Updating recent match id to [{recentMatch.match_id}] from [{playerState.latestMatchId}]");
 
                     // Recent match id has changed
@@ -75,11 +84,11 @@ namespace OfBot.DotaTracker
                     logger.LogInformation($"Updating latest match id of [{includedPlayers.ToList().Count}] included tracked players");
                     foreach (var state in includedPlayers)
                     {
-                        // Skip if recent match id is not difference than player state
+                        // Skip if recent match id is not different than player state
                         if (state.latestMatchId == recentMatch.match_id) {
                             continue;
                         }
-                        logger.LogInformation($"Updating latest match id of [{state.player.AccountId} {state.player.SteamName}] from [{state.latestMatchId}] to [{recentMatch.match_id}]");
+                        logger.LogInformation($"Updating latest match id of [{state.player.AccountId} {state.player.SteamName}] to [{recentMatch.match_id}] from [{state.latestMatchId}]");
                         state.latestMatchId = recentMatch.match_id;
                     }
 
