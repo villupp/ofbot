@@ -28,7 +28,7 @@ namespace OfBot.CommandHandlers
                 lineupStr += $"No users in lineup.";
             else
             {
-                lineupStr += $"Lineup (**{session.InUsers.Count}**): ";
+                lineupStr += $"Lineup ({session.InUsers.Count}): ";
 
                 for (var i = 0; i < session.InUsers.Count; i++)
                 {
