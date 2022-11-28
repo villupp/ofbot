@@ -137,6 +137,7 @@ namespace OfBot.CommandHandlers
             comment = comment.Replace(@"_", "");
             comment = comment.Replace(@"~", "");
             comment = comment.Replace(@"|", "");
+            comment = comment.Trim();
 
             var existingInUser = session.InUsers.Where(u => u.Username.ToLower() == userName.ToLower()).FirstOrDefault();
 
