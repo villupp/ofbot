@@ -133,7 +133,6 @@ namespace OfBot.CommandHandlers
             comment = comment.Replace(@")", "");
             comment = comment.Replace(@"`", "");
             comment = comment.Replace(@"*", "");
-            comment = comment.Replace(@"-", "");
             comment = comment.Replace(@"_", "");
             comment = comment.Replace(@"~", "");
             comment = comment.Replace(@"|", "");
