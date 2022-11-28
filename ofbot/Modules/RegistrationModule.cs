@@ -21,7 +21,7 @@ namespace OfBot.Modules
         // -registration dotkkaa klo 16?
         [Command("registration")]
         [Summary("Initiates a registration message with registration buttons.")]
-        [Alias("dotaa", "dota", "cs", "jengi", "letsplay", "reg", "peliä", "matsi", "roster", "rosteri", "pubg", "lineup", "r", "reg", "game", "game" , "g")]
+        [Alias("dotaa", "dota", "cs", "jengi", "letsplay", "reg", "peliä", "matsi", "roster", "rosteri", "pubg", "lineup", "r", "reg", "game" , "g")]
         public async Task StartRegistration([Summary("Optional button description.")] params string[] descParams)
         {
             var description = string.Join(" ", descParams);
