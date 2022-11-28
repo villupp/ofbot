@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using Microsoft.Extensions.Logging;
 using OfBot.CommandHandlers.Models;
+using OfBot.Common;
 
 namespace OfBot.CommandHandlers
 {
@@ -129,14 +130,9 @@ namespace OfBot.CommandHandlers
 
             var components = modal.Data.Components.ToList();
             var comment = components.First(x => x.CustomId == COMMENT_TEXT_ID).Value;
+            comment = StringHelpers.RemoveDiscordMarkdown(comment);
             comment = comment.Replace(@"(", "");
             comment = comment.Replace(@")", "");
-            comment = comment.Replace(@"`", "");
-            comment = comment.Replace(@"*", "");
-            comment = comment.Replace(@"_", "");
-            comment = comment.Replace(@"~", "");
-            comment = comment.Replace(@"|", "");
-            comment = comment.Trim();
 
             var existingInUser = session.InUsers.Where(u => u.Username.ToLower() == userName.ToLower()).FirstOrDefault();
 

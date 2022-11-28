@@ -2,6 +2,7 @@
 using Discord.Commands;
 using Microsoft.Extensions.Logging;
 using OfBot.CommandHandlers;
+using OfBot.Common;
 
 namespace OfBot.Modules
 {
@@ -25,6 +26,7 @@ namespace OfBot.Modules
         public async Task StartRegistration([Summary("Optional button description.")] params string[] descParams)
         {
             var description = string.Join(" ", descParams);
+            description = StringHelpers.RemoveDiscordMarkdown(description);
 
             logger.LogInformation($"Registration initiated by {Context.User.Username}: {description}");
 
