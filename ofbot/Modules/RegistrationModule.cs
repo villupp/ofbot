@@ -34,17 +34,12 @@ namespace OfBot.Modules
 
             if (string.IsNullOrEmpty(description))
                 description = $"{Context.User.Username}'s event";
-            
-            var builder = new ComponentBuilder()
-                .WithButton("I'm in!", registerButtonId.ToString(), ButtonStyle.Success)
-                .WithButton("I'm in, but..", commentButtonId.ToString(), ButtonStyle.Primary)
-                .WithButton("I'm out..", unregisterButtonId.ToString(), ButtonStyle.Secondary);
-
-            var component = builder.Build();
 
             var session = registrationHandler.CreateSession(registerButtonId, unregisterButtonId, commentButtonId, description, Context.User.Username);
+            var embed = RegistrationHandler.CreateLineupEmbed(session);
+            var btnComponent = RegistrationHandler.CreateButtonComponent(session);
 
-            var msg = await ReplyAsync(registrationHandler.CreateLineupString(session), components: component);
+            var msg = await ReplyAsync(null, components: btnComponent, embed: embed);
             session.Message = msg;
         }
     }

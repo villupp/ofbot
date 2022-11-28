@@ -19,20 +19,21 @@ namespace OfBot.CommandHandlers
             Sessions = new List<RegistrationSession>();
         }
 
-        public string CreateLineupString(RegistrationSession session)
+        public static Embed CreateLineupEmbed(RegistrationSession session)
         {
-            var lineupStr = $"{session.Description}\n";
+            var lineupStr = "";
+            var outStr = "";
 
             if (session.InUsers.Count == 0)
                 lineupStr += $"No users in lineup.";
             else
             {
-                lineupStr += $"Lineup ({session.InUsers.Count}): ";
+                lineupStr += $"Lineup (**{session.InUsers.Count}**): ";
 
                 for (var i = 0; i < session.InUsers.Count; i++)
                 {
                     var user = session.InUsers[i];
-                    lineupStr += $"{user.Username}";
+                    lineupStr += $"**{user.Username}**";
 
                     if (!string.IsNullOrEmpty(user.Comment))
                         lineupStr += $" ({user.Comment})";
@@ -43,9 +44,26 @@ namespace OfBot.CommandHandlers
             }
 
             if (session.OutUsers.Count > 0)
-                lineupStr += $"\nOut: {string.Join(", ", session.OutUsers)}.";
+                outStr = $"Out: {string.Join(", ", session.OutUsers)}";
 
-            return lineupStr;
+            var embedBuilder = new EmbedBuilder()
+                 .WithTitle(session.Description)
+                 .WithDescription(lineupStr)
+                 .WithColor(Color.Blue)
+                 .WithFooter(outStr)
+                 ;
+
+            return embedBuilder.Build();
+        }
+
+        public static MessageComponent CreateButtonComponent(RegistrationSession session)
+        {
+            var btnCompBuilder = new ComponentBuilder()
+                .WithButton("I'm in!", session.RegisterButtonId.ToString(), ButtonStyle.Success)
+                .WithButton("I'm in, but..", session.CommentButtonId.ToString(), ButtonStyle.Primary)
+                .WithButton("I'm out..", session.UnregisterButtonId.ToString(), ButtonStyle.Secondary);
+
+            return btnCompBuilder.Build();
         }
 
         public async Task OnRegister(Guid registerButtonId, SocketMessageComponent component)
@@ -66,7 +84,11 @@ namespace OfBot.CommandHandlers
             if (session.OutUsers.Contains(userName))
                 session.OutUsers.Remove(userName);
 
-            await component.UpdateAsync(mp => { mp.Content = CreateLineupString(session); });
+            await component.UpdateAsync(mp =>
+            {
+                mp.Embed = CreateLineupEmbed(session);
+                mp.Components = CreateButtonComponent(session);
+            });
         }
 
         public async Task OnUnregister(Guid unregisterButtonId, SocketMessageComponent component)
@@ -82,7 +104,11 @@ namespace OfBot.CommandHandlers
             if (!session.OutUsers.Contains(userName))
                 session.OutUsers.Add(userName);
 
-            await component.UpdateAsync(mp => { mp.Content = CreateLineupString(session); });
+            await component.UpdateAsync(mp =>
+            {
+                mp.Embed = CreateLineupEmbed(session);
+                mp.Components = CreateButtonComponent(session);
+            });
         }
 
         public async Task OnRegisterWithComment(Guid commentButtonId, SocketMessageComponent component)
@@ -103,10 +129,14 @@ namespace OfBot.CommandHandlers
 
             var components = modal.Data.Components.ToList();
             var comment = components.First(x => x.CustomId == COMMENT_TEXT_ID).Value;
-            comment = comment.Replace("(", "").Replace(")", ""); // No trolling
-            comment = comment.Replace("`", "");
-            comment = comment.Replace("~~", ""); 
-            comment = comment.Replace("||", "");
+            comment = comment.Replace(@"(", "");
+            comment = comment.Replace(@")", "");
+            comment = comment.Replace(@"`", "");
+            comment = comment.Replace(@"*", "");
+            comment = comment.Replace(@"-", "");
+            comment = comment.Replace(@"_", "");
+            comment = comment.Replace(@"~~", "");
+            comment = comment.Replace(@"||", "");
 
             var existingInUser = session.InUsers.Where(u => u.Username.ToLower() == userName.ToLower()).FirstOrDefault();
 
@@ -122,7 +152,10 @@ namespace OfBot.CommandHandlers
             if (session.OutUsers.Contains(userName))
                 session.OutUsers.Remove(userName);
 
-            await session.Message.ModifyAsync(mp => { mp.Content = CreateLineupString(session); });
+            await session.Message.ModifyAsync(mp => {
+                mp.Embed = CreateLineupEmbed(session);
+                mp.Components = CreateButtonComponent(session);
+            });
 
             await modal.DeferAsync(true);
         }
