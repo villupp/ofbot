@@ -60,9 +60,7 @@ namespace OfBot.DotaTracker
             if (this.gameLength.Hours > 0) {
                 gameTime += this.gameLength.ToString(@"hh\:");
             }
-            if (this.gameLength.Minutes > 0) {
-                gameTime += this.gameLength.ToString(@"mm\:");
-            }
+            gameTime += this.gameLength.ToString(@"mm\:");
             gameTime += this.gameLength.ToString(@"ss");
 
             var embed = new EmbedBuilder();
