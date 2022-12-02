@@ -9,7 +9,10 @@ namespace OfBot.CommandHandlers
     public class RegistrationHandler
     {
         private const string COMMENT_TEXT_ID = "comment-text";
+
         private ILogger logger;
+
+        private int sessionId = 0;
 
         public List<RegistrationSession> Sessions { get; set; }
 
@@ -48,10 +51,10 @@ namespace OfBot.CommandHandlers
                 outStr = $"Out: {string.Join(", ", session.OutUsers)}";
 
             var embedBuilder = new EmbedBuilder()
-                 .WithTitle(session.Description)
+                 .WithTitle($"{session.Id}: {session.Description}")
                  .WithDescription(lineupStr)
                  .WithColor(Color.Blue)
-                 .WithFooter(outStr)
+                 .WithFooter($"{outStr}")
                  ;
 
             return embedBuilder.Build();
@@ -148,7 +151,8 @@ namespace OfBot.CommandHandlers
             if (session.OutUsers.Contains(userName))
                 session.OutUsers.Remove(userName);
 
-            await session.Message.ModifyAsync(mp => {
+            await session.Message.ModifyAsync(mp =>
+            {
                 mp.Embed = CreateLineupEmbed(session);
                 mp.Components = CreateButtonComponent(session);
             });
@@ -169,7 +173,8 @@ namespace OfBot.CommandHandlers
                 RegisterButtonId = registerButtonId,
                 UnregisterButtonId = unregisterButtonId,
                 CommentButtonId = commentButtonId,
-                Description = description
+                Description = description,
+                Id = ++sessionId
             };
 
             session.InUsers.Add(new RegistrationUser() { Username = initialUserName });

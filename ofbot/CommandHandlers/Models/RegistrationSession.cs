@@ -10,6 +10,8 @@ namespace OfBot.CommandHandlers.Models
             OutUsers = new List<string>();
         }
 
+        public int Id { get; set; }
+
         public List<RegistrationUser> InUsers { get; set; }
 
         public List<string> OutUsers { get; set; }
