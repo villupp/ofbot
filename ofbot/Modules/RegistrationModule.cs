@@ -42,6 +42,8 @@ namespace OfBot.Modules
 
             var msg = await ReplyAsync(null, components: btnComponent, embed: embed);
             session.Message = msg;
+
+            await Context.Message.DeleteAsync();
         }
 
         // Reposts new registration session
@@ -73,6 +75,8 @@ namespace OfBot.Modules
 
             var msg = await ReplyAsync(null, components: btnComponent, embed: embed);
             session.Message = msg;
+
+            await Context.Message.DeleteAsync();
         }
     }
 }
