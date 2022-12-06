@@ -36,7 +36,7 @@ namespace OfBot.Modules
             if (string.IsNullOrEmpty(description))
                 description = $"{Context.User.Username}'s event";
 
-            var session = registrationHandler.CreateSession(registerButtonId, unregisterButtonId, commentButtonId, description, Context.User.Username);
+            var session = registrationHandler.CreateSession(registerButtonId, unregisterButtonId, commentButtonId, description, Context.User);
             var embed = RegistrationHandler.CreateLineupEmbed(session);
             var btnComponent = RegistrationHandler.CreateButtonComponent(session);
 

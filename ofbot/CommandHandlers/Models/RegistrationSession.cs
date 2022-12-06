@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.WebSocket;
 
 namespace OfBot.CommandHandlers.Models
 {
@@ -25,5 +26,9 @@ namespace OfBot.CommandHandlers.Models
         public string Description { get; set; }
 
         public IUserMessage Message { get; set; }
+
+        public DateTime CreatedOn { get; set; }
+
+        public SocketUser CreatedBy { get; set; }
     }
 }

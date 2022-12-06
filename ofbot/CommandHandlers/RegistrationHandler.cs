@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using Microsoft.Extensions.Logging;
 using OfBot.CommandHandlers.Models;
 using OfBot.Common;
+using System.Data;
 
 namespace OfBot.CommandHandlers
 {
@@ -27,6 +28,7 @@ namespace OfBot.CommandHandlers
         {
             var lineupStr = "";
             var outStr = "";
+            var fleTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(Constants.FLE_STANDARD_TIME_NAME);
 
             if (session.InUsers.Count == 0)
                 lineupStr += $"No users in lineup.";
@@ -48,13 +50,17 @@ namespace OfBot.CommandHandlers
             }
 
             if (session.OutUsers.Count > 0)
-                outStr = $"Out: {string.Join(", ", session.OutUsers)}";
+                outStr = $"Out: {string.Join(", ", session.OutUsers)}\n";
+
+            var createdOnFle = TimeZoneInfo.ConvertTime(session.CreatedOn, fleTimeZoneInfo);
 
             var embedBuilder = new EmbedBuilder()
-                 .WithTitle($"{session.Id}: {session.Description}")
+                 .WithTitle($"{session.Description}")
                  .WithDescription(lineupStr)
+                 .WithAuthor(session.CreatedBy)
                  .WithColor(Color.Blue)
-                 .WithFooter($"{outStr}")
+                 .WithFooter($"{outStr}ID: {session.Id}")
+                 .WithTimestamp(createdOnFle)
                  ;
 
             return embedBuilder.Build();
@@ -160,7 +166,7 @@ namespace OfBot.CommandHandlers
             await modal.DeferAsync(true);
         }
 
-        public RegistrationSession CreateSession(Guid registerButtonId, Guid unregisterButtonId, Guid commentButtonId, string description, string initialUserName)
+        public RegistrationSession CreateSession(Guid registerButtonId, Guid unregisterButtonId, Guid commentButtonId, string description, SocketUser createdBy)
         {
             logger.LogInformation($"Creating new registration session with" +
                 $" register button ID {registerButtonId}" +
@@ -174,10 +180,12 @@ namespace OfBot.CommandHandlers
                 UnregisterButtonId = unregisterButtonId,
                 CommentButtonId = commentButtonId,
                 Description = description,
-                Id = ++sessionId
+                Id = ++sessionId,
+                CreatedBy = createdBy,
+                CreatedOn = DateTime.UtcNow
             };
 
-            session.InUsers.Add(new RegistrationUser() { Username = initialUserName });
+            session.InUsers.Add(new RegistrationUser() { Username = createdBy.Username });
 
             // Only keep max 10 session in memory
             if (Sessions.Count > 10)
