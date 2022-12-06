@@ -1,6 +1,7 @@
 ﻿using Discord.Commands;
 using Microsoft.Extensions.Logging;
 using OfBot.CommandHandlers;
+using OfBot.CommandHandlers.Models;
 using OfBot.Common;
 
 namespace OfBot.Modules
@@ -36,7 +37,7 @@ namespace OfBot.Modules
             if (string.IsNullOrEmpty(description))
                 description = $"{Context.User.Username}'s event";
 
-            var session = registrationHandler.CreateSession(registerButtonId, unregisterButtonId, commentButtonId, description, Context.User);
+            var session = await registrationHandler.CreateSession(registerButtonId, unregisterButtonId, commentButtonId, description, Context.User);
             var embed = RegistrationHandler.CreateLineupEmbed(session);
             var btnComponent = RegistrationHandler.CreateButtonComponent(session);
 
@@ -47,34 +48,49 @@ namespace OfBot.Modules
         }
 
         // Reposts new registration session
-        // -bump 1
+        // -bump 1 (with ID)
+        // -bump (fetches most recent session by user)
         [Command("bump")]
         [Summary("Reposts a registration session.")]
         [Alias("b", "repost")]
-        public async Task Repost([Summary("ID of the registration session to repost.")] int sessionId)
+        public async Task Repost([Summary("ID of the registration session to repost.")] int? sessionId = null)
         {
-            logger.LogInformation($"Repost session ID {sessionId} initiated");
+            logger.LogInformation($"Repost session ID {(!sessionId.HasValue ? "<not given>" : sessionId)} initiated");
 
-            var session = registrationHandler.Sessions.Where(s => s.Id == sessionId).FirstOrDefault();
+            RegistrationSession session = null;
+
+            if (sessionId == null)
+            {
+                session = registrationHandler.Sessions
+                    .Where(s => s.CreatedBy.Username.ToLower() == Context.User.Username.ToLower())
+                    .OrderByDescending(s => s.CreatedOn)
+                    .FirstOrDefault();
+
+                if (session != null)
+                    logger.LogInformation($"Found recent session by {Context.User.Username}, ID {session.Id}");
+            }
+            else
+                session = registrationHandler.Sessions.Where(s => s.Id == sessionId).FirstOrDefault();
 
             if (session == null)
             {
-                logger.LogInformation($"Session not found with given ID {sessionId}");
-                await ReplyAsync($"Could not find session with ID {sessionId}.");
+                var errMsg = $"Cannot find valid session{(sessionId.HasValue ? $" with ID {sessionId}" : "")}";
+                logger.LogInformation(errMsg);
+                await ReplyAsync(errMsg);
                 return;
             }
 
             var embed = RegistrationHandler.CreateLineupEmbed(session);
             var btnComponent = RegistrationHandler.CreateButtonComponent(session);
 
-            logger.LogInformation($"Deleting message ID {session.Message.Id}..");
+            logger.LogInformation($"Deleting message ID {session.Message.Id}");
 
             await session.Message.DeleteAsync();
 
-            logger.LogInformation($"Reposting session ID {sessionId}..");
+            logger.LogInformation($"Reposting session ID {session.Id}");
 
-            var msg = await ReplyAsync(null, components: btnComponent, embed: embed);
-            session.Message = msg;
+            var sessionMessage = await ReplyAsync(null, components: btnComponent, embed: embed);
+            session.Message = sessionMessage;
 
             await Context.Message.DeleteAsync();
         }

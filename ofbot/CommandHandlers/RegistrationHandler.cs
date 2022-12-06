@@ -28,7 +28,6 @@ namespace OfBot.CommandHandlers
         {
             var lineupStr = "";
             var outStr = "";
-            var fleTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(Constants.FLE_STANDARD_TIME_NAME);
 
             if (session.InUsers.Count == 0)
                 lineupStr += $"No users in lineup.";
@@ -52,15 +51,13 @@ namespace OfBot.CommandHandlers
             if (session.OutUsers.Count > 0)
                 outStr = $"Out: {string.Join(", ", session.OutUsers)}\n";
 
-            var createdOnFle = TimeZoneInfo.ConvertTime(session.CreatedOn, fleTimeZoneInfo);
-
             var embedBuilder = new EmbedBuilder()
                  .WithTitle($"{session.Description}")
                  .WithDescription(lineupStr)
                  .WithAuthor(session.CreatedBy)
                  .WithColor(Color.Blue)
                  .WithFooter($"{outStr}ID: {session.Id}")
-                 .WithTimestamp(createdOnFle)
+                 .WithTimestamp(session.CreatedOn)
                  ;
 
             return embedBuilder.Build();
@@ -166,7 +163,7 @@ namespace OfBot.CommandHandlers
             await modal.DeferAsync(true);
         }
 
-        public RegistrationSession CreateSession(Guid registerButtonId, Guid unregisterButtonId, Guid commentButtonId, string description, SocketUser createdBy)
+        public async Task<RegistrationSession> CreateSession(Guid registerButtonId, Guid unregisterButtonId, Guid commentButtonId, string description, SocketUser createdBy)
         {
             logger.LogInformation($"Creating new registration session with" +
                 $" register button ID {registerButtonId}" +
@@ -189,11 +186,33 @@ namespace OfBot.CommandHandlers
 
             // Only keep max 10 session in memory
             if (Sessions.Count > 10)
+            {
+                await DeleteSessionMessage(session);
                 Sessions.RemoveAt(0);
+            }
 
             Sessions.Add(session);
 
             return session;
+        }
+
+        private async Task DeleteSessionMessage(RegistrationSession session)
+        {
+            logger.LogInformation($"DeleteMessage from session ID {session?.Id}");
+
+            try
+            {
+                if (session?.Message != null)
+                {
+                    var message = session.Message;
+                    logger.LogInformation($"Deleting message ID {message?.Id}");
+                    await message.DeleteAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"DeleteMessage failed for session message ID {session?.Message?.Id}: {ex.Message}");
+            }
         }
 
         private RegistrationSession GetSession(Guid buttonId)
