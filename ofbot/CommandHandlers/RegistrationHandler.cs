@@ -187,7 +187,7 @@ namespace OfBot.CommandHandlers
             // Only keep max 10 session in memory
             if (Sessions.Count > 10)
             {
-                await DeleteSessionMessage(session);
+                await DeleteSessionMessage(Sessions[0]);
                 Sessions.RemoveAt(0);
             }
 
