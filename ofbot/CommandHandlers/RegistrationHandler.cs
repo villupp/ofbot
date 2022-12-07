@@ -120,10 +120,24 @@ namespace OfBot.CommandHandlers
 
         public async Task OnRegisterWithComment(Guid commentButtonId, SocketMessageComponent component)
         {
+            var existingComment = string.Empty;
+            var session = GetSession(commentButtonId);
+
+            if (session == null)
+            {
+                await component.RespondAsync($"Could not find session..");
+                return;
+            }
+
+            var inUser = session.InUsers.Where(u => u.Username.ToLower() == component.User.Username.ToLower()).FirstOrDefault();
+
+            if (inUser != null)
+                existingComment = inUser.Comment;
+
             var mb = new ModalBuilder()
                 .WithTitle("I'm in, but..")
                 .WithCustomId(commentButtonId.ToString())
-                .AddTextInput("Comment", COMMENT_TEXT_ID, TextInputStyle.Short, "", 1, 25, true);
+                .AddTextInput("Comment", COMMENT_TEXT_ID, TextInputStyle.Short, "", 1, 25, true, existingComment);
 
             await component.RespondWithModalAsync(mb.Build());
         }
