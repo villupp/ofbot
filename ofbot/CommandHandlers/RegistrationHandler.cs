@@ -120,7 +120,7 @@ namespace OfBot.CommandHandlers
 
         public async Task OnRegisterWithComment(Guid commentButtonId, SocketMessageComponent component)
         {
-            var existingComment = string.Empty;
+            string existingComment = null;
             var session = GetSession(commentButtonId);
 
             if (session == null)
@@ -131,7 +131,7 @@ namespace OfBot.CommandHandlers
 
             var inUser = session.InUsers.Where(u => u.Username.ToLower() == component.User.Username.ToLower()).FirstOrDefault();
 
-            if (inUser != null)
+            if (inUser != null && !string.IsNullOrEmpty(inUser.Comment))
                 existingComment = inUser.Comment;
 
             var mb = new ModalBuilder()
