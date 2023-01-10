@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using OfBot.CommandHandlers;
 using OfBot.CommandHandlers.Models;
 using OfBot.Common;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace OfBot.Modules
 {
@@ -50,6 +51,9 @@ namespace OfBot.Modules
         // Reposts new registration session
         // -bump 1 (with ID)
         // -bump (fetches most recent session by user)
+        // Short alias:
+        // -b 1
+        // -b
         [Command("bump")]
         [Summary("Reposts a registration session.")]
         [Alias("b", "repost")]
@@ -74,7 +78,7 @@ namespace OfBot.Modules
 
             if (session == null)
             {
-                var errMsg = $"Cannot find valid session{(sessionId.HasValue ? $" with ID {sessionId}" : "")}";
+                var errMsg = $"Cannot find valid session {(sessionId.HasValue ? $" with ID {sessionId}" : "")}";
                 logger.LogInformation(errMsg);
                 await ReplyAsync(errMsg);
                 return;
@@ -93,6 +97,41 @@ namespace OfBot.Modules
             session.Message = sessionMessage;
 
             await Context.Message.DeleteAsync();
+        }
+
+        // Changes registration session description
+        // -cd <description>
+        // -changedescription <description>
+        // -cd initial description
+        // -changedescription new description
+        [Command("changedescription")]
+        [Summary("Changes description of user's most recent registration session.")]
+        [Alias("cd", "description", "desc")]
+        public async Task ChangeDescription([Summary("Session description.")] params string[] descParams)
+        {
+            var description = string.Join(" ", descParams);
+            description = StringHelpers.RemoveDiscordMarkdown(description);
+
+            logger.LogInformation($"Registration session description change to '{description}' initiated by {Context.User.Username}.");
+
+            var session = registrationHandler.Sessions
+                .Where(s => s.CreatedBy.Username.ToLower() == Context.User.Username.ToLower())
+                .OrderByDescending(s => s.CreatedOn)
+                .FirstOrDefault();
+
+            if (session == null)
+            {
+                var errMsg = $"Cannot find session by {Context.User.Username}";
+                logger.LogInformation(errMsg);
+                await ReplyAsync(errMsg);
+                return;
+            }
+
+            session.Description = description;
+
+            logger.LogInformation($"Changed description of most recent session by {Context.User.Username}, ID {session.Id} to '{description}'. Reposting..");
+
+            await Repost(session.Id);
         }
     }
 }
