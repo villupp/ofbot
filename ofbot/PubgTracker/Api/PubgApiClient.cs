@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
-using OfBot.Api.Dota;
 using OfBot.Common;
+using OfBot.Config;
+using OfBot.PubgTracker.Api.Models;
 using System.Net.Http.Json;
 
 namespace OfBot.PubgTracker.Api
@@ -11,57 +12,26 @@ namespace OfBot.PubgTracker.Api
         {
         }
 
-        public async Task<GetMatchHistoryResponse> GetRecentDotaMatches(string accountId, int limit)
+        public async Task<Player> GetPlayer(string playerName)
         {
-            var endpoint = "/IDOTA2Match_570/GetMatchHistory/v1";
-            string[] pathParams = new string[]
-            {
-                $"key={botSettings.SteamApiKey}",
-                $"account_id={accountId}",
-                $"matches_requested={limit}"
-            };
-            var pathParamsText = string.Join("&", pathParams);
-            string path = $"{endpoint}?{pathParamsText}";
-            var httpResponse = await httpClient.GetAsync(path);
-            if (httpResponse.IsSuccessStatusCode)
-            {
-                var getMatchHistoryResponse = await httpResponse.Content.ReadFromJsonAsync<GetMatchHistoryResponse>();
-                return getMatchHistoryResponse;
-            }
-            else
-            {
-                LogHttpFailure(httpResponse); ;
-                throw new HttpRequestException();
-            }
-        }
+            var reqUri = $"players?filter[playerNames]={playerName}";
+            var httpResponse = await httpClient.GetAsync(reqUri);
 
-        public async Task<GetMatchDetailsResponse> GetMatchDetails(long matchId)
-        {
-            var endpoint = "/IDOTA2Match_570/GetMatchDetails/v1";
-            string[] pathParams = new string[] {
-                $"key={botSettings.SteamApiKey}",
-                $"match_id={matchId}",
-                "include_persona_names=1"
-            };
-            var pathParamsText = string.Join("&", pathParams);
-            string path = $"{endpoint}?{pathParamsText}";
-            var httpResponse = await httpClient.GetAsync(path);
-            if (httpResponse.IsSuccessStatusCode)
-            {
-                var getMatchDetailsResponse = await httpResponse.Content.ReadFromJsonAsync<GetMatchDetailsResponse>();
-                return getMatchDetailsResponse;
-            }
-            else
+            if (!httpResponse.IsSuccessStatusCode)
             {
                 LogHttpFailure(httpResponse);
+
+                if (httpResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    return null;
+
                 throw new HttpRequestException();
             }
-        }
 
-        public async Task<Match> GetMostRecentDotaMatch(string accountId)
-        {
-            var res = await GetRecentDotaMatches(accountId, 1);
-            return res.result.matches.FirstOrDefault();
+            var playerRes = await httpResponse.Content.ReadFromJsonAsync<PlayerResponse>();
+            var resdbg = await httpResponse.Content.ReadAsStringAsync();
+            if (playerRes != null && playerRes?.Players?.Count > 0)
+                return playerRes.Players[0];
+            else return null;
         }
     }
 }

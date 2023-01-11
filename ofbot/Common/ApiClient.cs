@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using OfBot.Config;
 
 namespace OfBot.Common
 {

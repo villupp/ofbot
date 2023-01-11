@@ -11,6 +11,6 @@ namespace OfBot.TableStorage.Models
         public ETag ETag { get; set; }
         public string AddedBy { get; set; }
         public string Name { get; set; }
-        public long? Id { get; set; }
+        public string Id { get; set; }
     }
 }

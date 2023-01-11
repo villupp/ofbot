@@ -1,7 +1,7 @@
 using Discord.Commands;
 using Microsoft.Extensions.Logging;
-using System.Text.RegularExpressions;
 using OfBot.PubgTracker;
+using System.Text.RegularExpressions;
 
 namespace OfBot.Modules
 {
@@ -21,7 +21,7 @@ namespace OfBot.Modules
             this.trackedPlayerMngr = trackedPlayerMngr;
         }
 
-        // Replies with help for dotatracker component
+        // Replies with help for pubgtracker component
         // -pubgtracker help
         [Command("help")]
         [Alias("h", "?", "info")]
@@ -37,7 +37,7 @@ namespace OfBot.Modules
         }
 
         // Track a new dota player
-        // -pubgtracker track 
+        // -pubgtracker track
         [Command("track")]
         [Alias("add")]
         [Summary("Track a new player.")]
@@ -45,60 +45,56 @@ namespace OfBot.Modules
             [Remainder][Summary("Pubg player name")] string playerName)
         {
             var initiatedBy = $"{Context.User.Username}#{Context.User.Discriminator}";
-            logger.LogInformation($"Dotatracker track command initiated by {initiatedBy}. Player name: '{playerName}'");
+            logger.LogInformation($"PubgTracker track command initiated by {initiatedBy}. Player name: '{playerName}'");
 
-            
-                try
-                {
-                    var player = await trackedPlayerMngr.Add(playerName, initiatedBy);
-                    await Context.Channel.SendMessageAsync($"Tracking dota player {player.SteamName} [{playerName}]");
-                }
-                catch (Exception e)
-                {
-                    await Context.Channel.SendMessageAsync(e.Message);
-                }
-            
-        }
-
-
-        // Remove an existing tracked player
-        // -dotatracker untrack 
-        [Command("untrack")]
-        [Alias("remove")]
-        [Summary("Untrack an existing player.")]
-        public async Task Untrack(
-            [Remainder][Summary("Dota player account id")] string accountId)
-        {
-            logger.LogInformation($"Dotatracker untrack command initiated by {Context.User.Username}");
             try
             {
-                var player = await trackedPlayerMngr.Remove(accountId);
-                await Context.Channel.SendMessageAsync($"Removed tracked dota player {player.SteamName} [{accountId}]");
+                var player = await trackedPlayerMngr.Add(playerName, initiatedBy);
+                await Context.Channel.SendMessageAsync($"Tracking PUBG player {player.Name} [{player.Id}]");
             }
             catch (Exception e)
             {
-                await Context.Channel.SendMessageAsync($"Could not remove tracked player {accountId}: " + e.Message);
+                await Context.Channel.SendMessageAsync(e.Message);
             }
         }
 
         // Remove an existing tracked player
-        // -dotatracker untrack 
+        // -pubgtracker untrack
+        [Command("untrack")]
+        [Alias("remove", "r")]
+        [Summary("Untrack a tracked player.")]
+        public async Task Untrack(
+            [Remainder][Summary("PUBG player name")] string playerName)
+        {
+            logger.LogInformation($"PubgTracker untrack command initiated by {Context.User.Username}");
+            try
+            {
+                var player = await trackedPlayerMngr.Remove(playerName);
+                await Context.Channel.SendMessageAsync($"Removed tracked PUBG player {player.Name} [{player.Id}]");
+            }
+            catch (Exception e)
+            {
+                await Context.Channel.SendMessageAsync($"Could not remove tracked PUBG player {playerName}: " + e.Message);
+            }
+        }
+
         [Command("list")]
-        [Alias("get")]
+        [Alias("l")]
         [Summary("Get all tracked players.")]
         public async Task List()
         {
-            logger.LogInformation($"Dotatracker tracked players list command initiated by {Context.User.Username}");
+            logger.LogInformation($"PubgTracker tracked players list command initiated by {Context.User.Username}");
+
             try
             {
-                var players = trackedPlayerMngr.trackingStates.Select(state => $"{state.player.SteamName} [{state.player.AccountId}] added by {state.player.AddedBy}");
+                var players = trackedPlayerMngr.trackingStates.Select(state => $"{state.player.Name} [{state.player.Id}] added by {state.player.AddedBy}");
                 if (players.ToList().Count > 0)
                 {
-                    await Context.Channel.SendMessageAsync($"Currently tracked dota players:\n{String.Join("\n", players)}");
+                    await Context.Channel.SendMessageAsync($"Currently tracked PUBG players:\n{string.Join("\n", players)}");
                 }
                 else
                 {
-                    await Context.Channel.SendMessageAsync($"Currently tracked dota players:\n-");
+                    await Context.Channel.SendMessageAsync($"Currently tracked PUBG players:\n-");
                 }
             }
             catch (Exception e)

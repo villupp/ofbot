@@ -1,5 +1,5 @@
 using Discord.Commands;
-using OfBot.DotaTracker;
+using OfBot.PubgTracker;
 using Microsoft.Extensions.Logging;
 using System.Text.RegularExpressions;
 

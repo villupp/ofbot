@@ -7,13 +7,17 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using OfBot.CommandHandlers;
-using OfBot.Components;
-using OfBot.DotaTracker;
 using OfBot.Api.Dota;
 using OfBot.Api.OpenDota;
+using OfBot.CommandHandlers;
+using OfBot.Components;
+using OfBot.Config;
+using OfBot.PubgTracker;
+using OfBot.PubgTracker;
+using OfBot.PubgTracker.Api;
 using OfBot.TableStorage;
 using OfBot.TableStorage.Models;
+using System.Net;
 
 namespace OfBot
 {
@@ -44,7 +48,6 @@ namespace OfBot
                     builder.AddTableServiceClient(botSettings.StorageKey);
                 });
 
-
                 services.AddHostedService<BotService>();
 
                 services.AddSingleton(serviceProvider => serviceProvider);
@@ -60,6 +63,7 @@ namespace OfBot
                 services.AddSingleton<ButtonHandler>();
                 services.AddSingleton<ModalHandler>();
                 services.AddSingleton<AnnouncementService>();
+                services.AddSingleton<AuthenticationHandler>();
 
                 // DotaTracker
                 services.AddSingleton<TableStorageService<TrackedDotaPlayer>>();
@@ -67,6 +71,18 @@ namespace OfBot
                 services.AddSingleton<TrackedDotaPlayers>();
                 services.AddHttpClient<DotaApiClient>(client => { client.BaseAddress = new Uri("https://api.steampowered.com"); });
                 services.AddHttpClient<OpenDotaApiClient>(client => { client.BaseAddress = new Uri("https://api.opendota.com"); });
+
+                // PubgTracker
+                services.AddSingleton<TableStorageService<TrackedPubgPlayer>>();
+                services.AddSingleton<PubgPoller>();
+                services.AddSingleton<TrackedPubgPlayerManager>();
+                services.AddHttpClient<PubgApiClient>(client => { client.BaseAddress = new Uri(botSettings.PubgApiBaseUrl); })
+                    .AddHttpMessageHandler<AuthenticationHandler>()
+                    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
+                    {
+                        DefaultProxyCredentials = CredentialCache.DefaultCredentials
+                    })
+                    ;
             })
                 .ConfigureLogging((context, builder) =>
                 {

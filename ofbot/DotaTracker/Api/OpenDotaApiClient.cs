@@ -1,6 +1,7 @@
 using System.Net.Http.Json;
 using Microsoft.Extensions.Logging;
 using OfBot.Common;
+using OfBot.Config;
 
 namespace OfBot.Api.OpenDota
 {
