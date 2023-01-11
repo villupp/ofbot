@@ -13,7 +13,6 @@ using OfBot.CommandHandlers;
 using OfBot.Components;
 using OfBot.Config;
 using OfBot.PubgTracker;
-using OfBot.PubgTracker;
 using OfBot.PubgTracker.Api;
 using OfBot.TableStorage;
 using OfBot.TableStorage.Models;

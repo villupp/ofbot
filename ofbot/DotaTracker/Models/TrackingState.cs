@@ -1,4 +1,4 @@
-namespace OfBot.Common
+namespace OfBot.DotaTracker.Models
 {
     public class TrackingState<T>
     {

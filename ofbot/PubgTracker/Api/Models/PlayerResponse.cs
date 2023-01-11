@@ -68,7 +68,16 @@ namespace OfBot.PubgTracker.Api.Models
     public class Matches
     {
         [JsonPropertyName("data")]
-        public List<Player> Data { get; set; }
+        public List<Match> Data { get; set; }
+    }
+
+    public class Match
+    {
+        [JsonPropertyName("type")]
+        public string Type { get; set; }
+
+        [JsonPropertyName("id")]
+        public Guid? Id { get; set; }
     }
 
     public class Meta

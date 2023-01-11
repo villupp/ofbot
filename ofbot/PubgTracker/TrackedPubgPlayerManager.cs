@@ -1,5 +1,6 @@
-﻿using OfBot.Common;
+﻿using OfBot.DotaTracker.Models;
 using OfBot.PubgTracker.Api;
+using OfBot.PubgTracker.Models;
 using OfBot.TableStorage;
 using OfBot.TableStorage.Models;
 
@@ -7,7 +8,7 @@ namespace OfBot.PubgTracker
 {
     public class TrackedPubgPlayerManager
     {
-        public List<TrackingState<TrackedPubgPlayer>> trackingStates { get; set; }
+        public List<TrackingState> trackedPlayers { get; set; }
         private TableStorageService<TrackedPubgPlayer> tableService;
         private PubgApiClient pubgClient;
 
@@ -16,7 +17,7 @@ namespace OfBot.PubgTracker
             PubgApiClient pubgClient
             )
         {
-            trackingStates = new List<TrackingState<TrackedPubgPlayer>>();
+            trackedPlayers = new List<TrackingState>();
             this.tableService = tableService;
             this.pubgClient = pubgClient;
         }
@@ -41,10 +42,10 @@ namespace OfBot.PubgTracker
             };
 
             await tableService.Add(trackedPlayer);
-            trackingStates.Add(new TrackingState<TrackedPubgPlayer>()
+            this.trackedPlayers.Add(new TrackingState()
             {
-                latestMatchId = null,
-                player = trackedPlayer
+                LatestMatchId = null,
+                Player = trackedPlayer
             });
 
             return trackedPlayer;
@@ -58,7 +59,7 @@ namespace OfBot.PubgTracker
                 throw new Exception($"Could not find tracked PUBG player with name '{playerName}'");
 
             await tableService.Delete(player);
-            trackingStates.Remove(trackingStates.FirstOrDefault(state => state.player.Name == playerName));
+            trackedPlayers.Remove(trackedPlayers.FirstOrDefault(state => state.Player.Name == playerName));
             return player;
         }
 
@@ -76,19 +77,19 @@ namespace OfBot.PubgTracker
         public async Task Refresh()
         {
             var players = await tableService.Get(trackedPubgPlayer => true);
-            trackingStates.Clear();
+            trackedPlayers.Clear();
 
             foreach (var player in players)
             {
-                trackingStates.Add(new TrackingState<TrackedPubgPlayer>
+                trackedPlayers.Add(new TrackingState
                 {
-                    player = player,
-                    latestMatchId = null
+                    Player = player,
+                    LatestMatchId = null
                 });
             }
 
-            trackingStates.Sort(
-                (x, y) => Nullable.Compare(x.player.Timestamp, y.player.Timestamp));
+            trackedPlayers.Sort(
+                (x, y) => Nullable.Compare(x.Player.Timestamp, y.Player.Timestamp));
         }
     }
 }

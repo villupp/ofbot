@@ -87,7 +87,7 @@ namespace OfBot.Modules
 
             try
             {
-                var players = trackedPlayerMngr.trackingStates.Select(state => $"{state.player.Name} [{state.player.Id}] added by {state.player.AddedBy}");
+                var players = trackedPlayerMngr.trackedPlayers.Select(state => $"{state.Player.Name} [{state.Player.Id}] added by {state.Player.AddedBy}");
                 if (players.ToList().Count > 0)
                 {
                     await Context.Channel.SendMessageAsync($"Currently tracked PUBG players:\n{string.Join("\n", players)}");

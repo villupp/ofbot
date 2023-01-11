@@ -12,26 +12,40 @@ namespace OfBot.PubgTracker.Api
         {
         }
 
-        public async Task<Player> GetPlayer(string playerName)
+        public async Task<List<Player>> GetPlayers(List<string> playerNames)
         {
-            var reqUri = $"players?filter[playerNames]={playerName}";
+            var playerNamesStr = string.Join(',', playerNames);
+
+            logger.LogInformation($"Getting players: '{playerNamesStr}'");
+
+            var reqUri = $"players?filter[playerNames]={}";
             var httpResponse = await httpClient.GetAsync(reqUri);
 
             if (!httpResponse.IsSuccessStatusCode)
             {
-                LogHttpFailure(httpResponse);
-
                 if (httpResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
                     return null;
+
+                LogHttpFailure(httpResponse);
 
                 throw new HttpRequestException();
             }
 
             var playerRes = await httpResponse.Content.ReadFromJsonAsync<PlayerResponse>();
-            var resdbg = await httpResponse.Content.ReadAsStringAsync();
-            if (playerRes != null && playerRes?.Players?.Count > 0)
-                return playerRes.Players[0];
-            else return null;
+
+            logger.LogInformation($"Got {playerRes?.Players?.Count} players from PUBG API");
+
+            return playerRes.Players;
+        }
+
+        public async Task<Player> GetPlayer(string playerName)
+        {
+            var players = await GetPlayers(new List<string>() { playerName });
+
+            if (players != null && players?.Count > 0)
+                return players[0];
+            else
+                return null;
         }
     }
 }

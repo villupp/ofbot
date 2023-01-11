@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using OfBot.Api.Dota;
-using OfBot.Common;
 using OfBot.Config;
+using OfBot.DotaTracker.Models;
 using OfBot.TableStorage.Models;
 
 namespace OfBot.PubgTracker
