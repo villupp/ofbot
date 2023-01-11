@@ -1,50 +1,51 @@
+﻿
 using OfBot.TableStorage.Models;
 using OfBot.TableStorage;
-using OfBot.Api.OpenDota;
-using OfBot.Api.Dota;
 using OfBot.Common;
+using OfBot.PubgTracker.Api;
 
-namespace OfBot.DotaTracker
+namespace OfBot.PubgTracker
 {
-    public class TrackedDotaPlayers
+    public class TrackedPubgPlayerManager
     {
-        public List<TrackingState<TrackedDotaPlayer>> trackingStates { get; set; }
-        private TableStorageService<TrackedDotaPlayer> tableService;
-        private DotaApiClient dotaApi;
-        private OpenDotaApiClient openDotaApi;
 
-        public TrackedDotaPlayers(
-            TableStorageService<TrackedDotaPlayer> commandTableService,
-            DotaApiClient dotaApi,
-            OpenDotaApiClient openDotaApi
-        )
+             public List<TrackingState<TrackedPubgPlayer>> trackingStates { get; set; }
+        private TableStorageService<TrackedPubgPlayer> tableService;
+        private PubgApiClient pubgClient;
+
+        public TrackedPubgPlayerManager(
+            TableStorageService<TrackedPubgPlayer> tableService,
+            PubgApiClient pubgClient
+            )
         {
-            this.trackingStates = new List<TrackingState<TrackedDotaPlayer>>();
-            this.tableService = commandTableService;
-            this.dotaApi = dotaApi;
-            this.openDotaApi = openDotaApi;
+            this.trackingStates = new List<TrackingState<TrackedPubgPlayer>>();
+            this.tableService = tableService;
+            this.pubgClient = pubgClient;
         }
-        public async Task<TrackedDotaPlayer> Add(string accountId, string addedBy)
+
+        public async Task<TrackedDotaPlayer> Add(string playerName, string addedBy)
         {
-            var player = await this.Exists(accountId);
+            var player = await this.Exists(playerName);
             if (player != null)
             {
-                throw new Exception($"Dota player {accountId} is already tracked");
-            }
-            var validationState = await Validate(accountId);
-            if (validationState.steamName == null)
-            {
-                throw new Exception(validationState.errorMessage);
+                throw new Exception($"Pubg player {playerName} is already tracked");
             }
 
-            var trackedPlayer = new TrackedDotaPlayer()
+            var isValid = await IsValid(playerName);
+            if (!isValid)
+            {
+                throw new Exception(isValid);
+            }
+
+            var trackedPlayer = new TrackedPubgPlayer()
             {
                 RowKey = Guid.NewGuid().ToString(),
                 PartitionKey = "",
-                AccountId = accountId,
+                Name = playerName,
                 AddedBy = addedBy,
-                SteamName = validationState.steamName
+                Id = 12345 // ??
             };
+
             await tableService.Add(trackedPlayer);
             this.trackingStates.Add(new TrackingState<TrackedDotaPlayer>()
             {
@@ -53,6 +54,7 @@ namespace OfBot.DotaTracker
             });
             return trackedPlayer;
         }
+
         public async Task<TrackedDotaPlayer> Remove(string accountId)
         {
             var player = await this.Exists(accountId);
@@ -64,6 +66,7 @@ namespace OfBot.DotaTracker
             this.trackingStates.Remove(this.trackingStates.FirstOrDefault(state => state.player.AccountId == accountId));
             return player;
         }
+
         private async Task<TrackedDotaPlayer> Exists(string accountId)
         {
             var existingPlayers = await tableService.Get(
@@ -74,6 +77,7 @@ namespace OfBot.DotaTracker
             }
             return null;
         }
+
         public async Task Refresh()
         {
             var players = await tableService.Get(trackedDotaPlayer => true);
@@ -90,24 +94,25 @@ namespace OfBot.DotaTracker
                 (x, y) => Nullable.Compare(x.player.Timestamp, y.player.Timestamp));
         }
 
-        private async Task<(string steamName, string errorMessage)> Validate(string accountId)
+        private async Task<bool> IsValid(string playerName)
         {
-            var response = await dotaApi.GetRecentDotaMatches(accountId, 1);
-            if (response == null)
-            {
-                return (null, $"Couldn't validate account id {accountId}, Steam API might be down");
-            }
-            else if (response.result.status != 1)
-            {
-                return (null, $"Account id {accountId} match history is not exposed");
-            }
-            // Get player information from OpenDota Api
-            var openDotaPlayer = await openDotaApi.GetPlayer(accountId);
-            if (openDotaPlayer?.profile?.personaname == null)
-            {
-                return (null, $"Couldn't validate account id {accountId}, OpenDota API might be down");
-            }
-            return (openDotaPlayer.profile.personaname, null);
+            //var response = await pubgClient.GetRecentDotaMatches(accountId, 1);
+            //if (response == null)
+            //{
+            //    return (null, $"Couldn't validate account id {accountId}, Steam API might be down");
+            //}
+            //else if (response.result.status != 1)
+            //{
+            //    return (null, $"Account id {accountId} match history is not exposed");
+            //}
+            //// Get player information from OpenDota Api
+            //var openDotaPlayer = await openDotaApi.GetPlayer(accountId);
+            //if (openDotaPlayer?.profile?.personaname == null)
+            //{
+            //    return (null, $"Couldn't validate account id {accountId}, OpenDota API might be down");
+            //}
+            //return (openDotaPlayer.profile.personaname, null);
+            return true;
         }
 
         // Return false if update is not done
@@ -139,4 +144,5 @@ namespace OfBot.DotaTracker
             return this.trackingStates.FirstOrDefault(s => s.player.AccountId == accountId);
         }
     }
+    
 }

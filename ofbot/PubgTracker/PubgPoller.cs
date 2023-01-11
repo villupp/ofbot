@@ -1,29 +1,28 @@
 using Microsoft.Extensions.Logging;
-using OfBot.Api.Dota;
-using OfBot.Common;
+using OfBot.PubgTracker;
 using OfBot.TableStorage.Models;
 
 namespace OfBot.DotaTracker
 {
-    public class DotaPoller
+    public class PubgPoller
     {
-        private readonly ILogger<DotaPoller> logger;
+        private readonly ILogger<PubgPoller> logger;
         private readonly AnnouncementService announcementService;
-        private readonly DotaApiClient dotaApiClient;
+        private readonly PubgApiClient pubgClient;
         private readonly TrackedDotaPlayers trackedPlayers;
         private readonly BotSettings botSettings;
 
-        public DotaPoller(
-            ILogger<DotaPoller> logger,
+        public PubgPoller(
+            ILogger<PubgPoller> logger,
             AnnouncementService announcementService,
-            DotaApiClient dotaApi,
+            PubgApiClient pubgClient,
             TrackedDotaPlayers trackedPlayers,
             BotSettings botSettings
             )
         {
             this.logger = logger;
             this.announcementService = announcementService;
-            this.dotaApiClient = dotaApi;
+            this.pubgClient = pubgClient;
             this.trackedPlayers = trackedPlayers;
             this.botSettings = botSettings;
         }

@@ -21,4 +21,8 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="PubgTracker\Api\Models\" />
+    <Folder Include="PubgTracker\Models\" />
+  </ItemGroup>
 </Project>
