@@ -1,8 +1,8 @@
 using Discord;
 using Microsoft.Extensions.Logging;
-using OfBot.Config;
 using OfBot.Api.Pubg;
 using OfBot.Api.Pubg.Models;
+using OfBot.Config;
 
 namespace OfBot.PubgTracker
 {
@@ -36,10 +36,18 @@ namespace OfBot.PubgTracker
 
             var timer = new PeriodicTimer(TimeSpan.FromSeconds(botSettings.PubgTrackerPollingIntervalSeconds));
             logger.LogInformation("PubgTracker polling service started");
+
             do
             {
-                logger.LogDebug("Polling for recent PUBG matches of tracked players");
-                await AnnounceRecentMatches();
+                try
+                {
+                    logger.LogDebug("Polling for recent PUBG matches of tracked players");
+                    await AnnounceRecentMatches();
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError($"PubgPoller iteration failed: {ex}");
+                }
             } while (await timer.WaitForNextTickAsync());
         }
 
