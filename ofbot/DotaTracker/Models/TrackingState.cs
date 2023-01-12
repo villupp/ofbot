@@ -1,8 +1,8 @@
-
-namespace OfBot.DotaTracker
+namespace OfBot.DotaTracker.Models
 {
-    public class TrackingState<T> {
+    public class TrackingState<T>
+    {
         public T player { get; set; }
-        public Int64? latestMatchId { get; set; }
+        public long? latestMatchId { get; set; }
     }
 }

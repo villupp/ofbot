@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Logging;
 using OfBot.Api.Dota;
+using OfBot.Config;
+using OfBot.DotaTracker.Models;
 using OfBot.TableStorage.Models;
 
 namespace OfBot.DotaTracker
@@ -105,8 +107,8 @@ namespace OfBot.DotaTracker
                     var playerIdList = includedPlayers.Select(p => Int64.Parse(p.player.AccountId)).ToList();
                     var matchDetails = new AnnouncedMatchDetails(response, playerIdList, playerNames);
                     await announcementService.Announce(
-                        botSettings.DotaTrackerAnnouncementGuild,
-                        botSettings.DotaTrackerAnnouncementChannel,
+                        botSettings.AnnouncementGuild,
+                        botSettings.AnnouncementChannel,
                         matchDetails.BuildEmbed()
                     );
                 }
