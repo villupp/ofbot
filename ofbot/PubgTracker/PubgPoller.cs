@@ -150,9 +150,9 @@ namespace OfBot.PubgTracker
             {
                 var playerName = player.Attributes.Stats.Name;
 
-                if (players.Last().Attributes.Stats.Name == playerName)
+                if (players.Count > 1 && players.Last().Attributes.Stats.Name == playerName)
                     playerNamesStr += " and ";
-                else if (players.First().Attributes.Stats.Name != playerName)
+                else if (players.Count > 1 && players.First().Attributes.Stats.Name != playerName)
                     playerNamesStr += ", ";
 
                 playerNamesStr += $"{playerName}";
