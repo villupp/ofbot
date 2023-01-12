@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
 using OfBot.Common;
 using OfBot.Config;
-using OfBot.PubgTracker.Api.Models;
+using OfBot.Api.Pubg.Models;
 using System.Net.Http.Json;
 
-namespace OfBot.PubgTracker.Api
+namespace OfBot.Api.Pubg
 {
     public class PubgApiClient : ApiClient
     {

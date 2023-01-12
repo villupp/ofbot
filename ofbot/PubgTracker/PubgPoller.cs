@@ -1,10 +1,10 @@
 using Discord;
 using Microsoft.Extensions.Logging;
 using OfBot.Config;
-using OfBot.PubgTracker.Api;
-using OfBot.PubgTracker.Api.Models;
+using OfBot.Api.Pubg;
+using OfBot.Api.Pubg.Models;
 
-namespace OfBot.PubgTracker
+namespace OfBot.Api
 {
     public class PubgPoller
     {

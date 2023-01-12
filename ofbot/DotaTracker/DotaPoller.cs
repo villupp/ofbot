@@ -4,7 +4,7 @@ using OfBot.Config;
 using OfBot.DotaTracker.Models;
 using OfBot.TableStorage.Models;
 
-namespace OfBot.PubgTracker
+namespace OfBot.DotaTracker
 {
     public class DotaPoller
     {

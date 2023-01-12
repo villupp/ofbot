@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace OfBot.PubgTracker.Api.Models
+namespace OfBot.Api.Pubg.Models
 {
     public class MatchAttributes
     {

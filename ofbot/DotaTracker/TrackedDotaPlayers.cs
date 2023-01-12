@@ -4,7 +4,7 @@ using OfBot.Api.OpenDota;
 using OfBot.Api.Dota;
 using OfBot.DotaTracker.Models;
 
-namespace OfBot.PubgTracker
+namespace OfBot.DotaTracker
 {
     public class TrackedDotaPlayers
     {

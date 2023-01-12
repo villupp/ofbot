@@ -2,7 +2,7 @@
 using OfBot.Config;
 using System.Net.Http.Headers;
 
-namespace OfBot.PubgTracker.Api
+namespace OfBot.Api.Pubg
 {
     public class AuthenticationHandler : DelegatingHandler
     {

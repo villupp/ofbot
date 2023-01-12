@@ -1,6 +1,6 @@
 using OfBot.TableStorage.Models;
 
-namespace OfBot.PubgTracker.Models
+namespace OfBot.Api.Models
 {
     public class TrackingState
     {

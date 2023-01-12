@@ -1,7 +1,7 @@
 using Discord;
 using OfBot.Api.Dota;
 
-namespace OfBot.PubgTracker
+namespace OfBot.DotaTracker
 {
     public enum Team
     {
