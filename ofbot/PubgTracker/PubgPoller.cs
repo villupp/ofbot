@@ -175,13 +175,32 @@ namespace OfBot.PubgTracker
             embed.WithColor(color)
             .WithTitle($"{chicken}{playerNamesStr} finished #{winPlace} in a match of PUBG!")
             .WithDescription(
-                $"{playerStatsStr}");
+                $"Map: {GetMapName(matchRes.Match.Attributes.MapName)}\n{playerStatsStr}");
 
             await announcementService.Announce(
                 botSettings.AnnouncementGuild,
                 botSettings.AnnouncementChannel,
                 embed.Build()
             );
+        }
+
+        private string GetMapName(string internalMapName)
+        {
+            return internalMapName switch
+            {
+                "Baltic_Main" => "Erangel",
+                "Chimera_Main" => "Paramo",
+                "Desert_Main" => "Miramar",
+                "DihorOtok_Main" => "Vikendi",
+                "Erangel_Main" => "Erangel",
+                "Heaven_Main" => "Haven",
+                "Kiki_Main" => "Deston",
+                "Range_Main" => "Camp Jackal",
+                "Savage_Main" => "Sanhok",
+                "Summerland_Main" => "Karakin",
+                "Tiger_Main" => "Taego",
+                _ => internalMapName,
+            };
         }
     }
 }
