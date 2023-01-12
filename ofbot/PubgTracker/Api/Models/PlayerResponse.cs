@@ -14,12 +14,6 @@ namespace OfBot.PubgTracker.Api.Models
         public Meta Meta { get; set; }
     }
 
-    public class Assets
-    {
-        [JsonPropertyName("data")]
-        public List<object> Data { get; set; }
-    }
-
     public class Attributes
     {
         [JsonPropertyName("patchVersion")]
@@ -68,16 +62,16 @@ namespace OfBot.PubgTracker.Api.Models
     public class Matches
     {
         [JsonPropertyName("data")]
-        public List<Match> Data { get; set; }
+        public List<PlayerMatch> Data { get; set; }
     }
 
-    public class Match
+    public class PlayerMatch
     {
         [JsonPropertyName("type")]
         public string Type { get; set; }
 
         [JsonPropertyName("id")]
-        public Guid? Id { get; set; }
+        public Guid Id { get; set; }
     }
 
     public class Meta
@@ -86,9 +80,6 @@ namespace OfBot.PubgTracker.Api.Models
 
     public class Relationships
     {
-        [JsonPropertyName("assets")]
-        public Assets Assets { get; set; }
-
         [JsonPropertyName("matches")]
         public Matches Matches { get; set; }
     }

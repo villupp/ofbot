@@ -12,13 +12,38 @@ namespace OfBot.PubgTracker.Api
         {
         }
 
+        public async Task<MatchResponse> GetMatch(Guid matchId)
+        {
+            logger.LogInformation($"Getting match {matchId}");
+
+            var reqUri = $"matches/{matchId}";
+
+            var httpResponse = await httpClient.GetAsync(reqUri);
+
+            if (!httpResponse.IsSuccessStatusCode)
+            {
+                if (httpResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    return null;
+
+                LogHttpFailure(httpResponse);
+
+                throw new HttpRequestException();
+            }
+
+            var matchRes = await httpResponse.Content.ReadFromJsonAsync<MatchResponse>();
+
+            logger.LogInformation($"Got match ID {matchId} from PUBG API");
+
+            return matchRes;
+        }
+
         public async Task<List<Player>> GetPlayers(List<string> playerNames)
         {
             var playerNamesStr = string.Join(',', playerNames);
 
             logger.LogInformation($"Getting players: '{playerNamesStr}'");
 
-            var reqUri = $"players?filter[playerNames]={}";
+            var reqUri = $"players?filter[playerNames]={playerNamesStr}";
             var httpResponse = await httpClient.GetAsync(reqUri);
 
             if (!httpResponse.IsSuccessStatusCode)
@@ -32,8 +57,6 @@ namespace OfBot.PubgTracker.Api
             }
 
             var playerRes = await httpResponse.Content.ReadFromJsonAsync<PlayerResponse>();
-
-            logger.LogInformation($"Got {playerRes?.Players?.Count} players from PUBG API");
 
             return playerRes.Players;
         }

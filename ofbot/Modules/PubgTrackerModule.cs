@@ -1,6 +1,8 @@
 using Discord.Commands;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 using OfBot.PubgTracker;
+using OfBot.PubgTracker.Api;
 using System.Text.RegularExpressions;
 
 namespace OfBot.Modules
@@ -11,14 +13,17 @@ namespace OfBot.Modules
     {
         private ILogger logger;
         private TrackedPubgPlayerManager trackedPlayerMngr;
+        private PubgApiClient pubgClient;
 
         public PubgTrackerModule(
             ILogger<PubgTrackerModule> logger,
-            TrackedPubgPlayerManager trackedPlayerMngr
+            TrackedPubgPlayerManager trackedPlayerMngr,
+            PubgApiClient pubgClient
             )
         {
             this.logger = logger;
             this.trackedPlayerMngr = trackedPlayerMngr;
+            this.pubgClient = pubgClient;
         }
 
         // Replies with help for pubgtracker component

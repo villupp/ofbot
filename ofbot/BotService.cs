@@ -21,6 +21,7 @@ namespace OfBot
         private readonly ButtonHandler buttonHandler;
         private readonly ModalHandler modalHandler;
         private readonly DotaPoller dotaPoller;
+        private readonly PubgPoller pubgPoller;
 
         public BotService(
             ILogger<BotService> logger,
@@ -31,7 +32,8 @@ namespace OfBot
             IServiceProvider serviceProvider,
             ButtonHandler buttonHandler,
             ModalHandler modalHandler,
-            DotaPoller dotaPoller
+            DotaPoller dotaPoller,
+            PubgPoller pubgPoller
             )
         {
             appLifetime.ApplicationStarted.Register(OnStarted);
@@ -46,6 +48,7 @@ namespace OfBot
             this.buttonHandler = buttonHandler;
             this.modalHandler = modalHandler;
             this.dotaPoller = dotaPoller;
+            this.pubgPoller = pubgPoller;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -65,8 +68,17 @@ namespace OfBot
             discordSocketClient.Ready += async () =>
             {
                 logger.LogInformation("Bot is connected and ready");
-                logger.LogInformation("Starting dota tracker polling service");
-                await dotaPoller.Start(); // Start the dota tracker poller
+
+                if (botSettings.DotaTrackerIsEnabled)
+                {
+                    logger.LogInformation("Starting dota tracker polling service");
+                    await dotaPoller.Start();
+                }
+                if (botSettings.PubgTrackerIsEnabled)
+                {
+                    logger.LogInformation("Starting PUBG tracker polling service");
+                    await pubgPoller.Start();
+                }
             };
 
             discordSocketClient.ButtonExecuted += buttonHandler.OnButtonExecuted;
