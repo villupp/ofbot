@@ -43,7 +43,7 @@ namespace OfBot.DotaTracker
                     logger.LogDebug("Polling for recent dota matches of tracked players");
                     await AnnounceRecentMatches();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     logger.LogError($"DotaPoller iteration failed: {ex}");
                 }

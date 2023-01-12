@@ -73,12 +73,12 @@ namespace OfBot
                 if (botSettings.DotaTrackerIsEnabled)
                 {
                     logger.LogInformation("Starting dota tracker polling service");
-                    await dotaPoller.Start();
+                    _ = dotaPoller.Start().ConfigureAwait(false);
                 }
                 if (botSettings.PubgTrackerIsEnabled)
                 {
                     logger.LogInformation("Starting PUBG tracker polling service");
-                    await pubgPoller.Start();
+                    _ = pubgPoller.Start().ConfigureAwait(false);
                 }
             };
 
