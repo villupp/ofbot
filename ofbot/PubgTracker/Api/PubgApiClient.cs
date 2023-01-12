@@ -40,9 +40,6 @@ namespace OfBot.Api.Pubg
         public async Task<List<Player>> GetPlayers(List<string> playerNames)
         {
             var playerNamesStr = string.Join(',', playerNames);
-
-            logger.LogInformation($"Getting players: '{playerNamesStr}'");
-
             var reqUri = $"players?filter[playerNames]={playerNamesStr}";
             var httpResponse = await httpClient.GetAsync(reqUri);
 
