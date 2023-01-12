@@ -4,7 +4,7 @@ using OfBot.Config;
 using OfBot.Api.Pubg;
 using OfBot.Api.Pubg.Models;
 
-namespace OfBot.Api
+namespace OfBot.PubgTracker
 {
     public class PubgPoller
     {

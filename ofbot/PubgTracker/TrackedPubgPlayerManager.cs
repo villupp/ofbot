@@ -1,10 +1,9 @@
-﻿using OfBot.DotaTracker.Models;
-using OfBot.Api.Pubg;
-using OfBot.Api.Models;
+﻿using OfBot.Api.Pubg;
+using OfBot.PubgTracker.Models;
 using OfBot.TableStorage;
 using OfBot.TableStorage.Models;
 
-namespace OfBot.Api
+namespace OfBot.PubgTracker
 {
     public class TrackedPubgPlayerManager
     {
