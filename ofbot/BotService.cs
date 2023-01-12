@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using OfBot.Components;
 using OfBot.Config;
 using OfBot.DotaTracker;
-using OfBot.Api;
+using OfBot.PubgTracker;
 using System.Reflection;
 
 namespace OfBot

@@ -6,7 +6,6 @@ namespace OfBot.Api.Pubg
 {
     public class AuthenticationHandler : DelegatingHandler
     {
-
         private readonly BotSettings settings;
         private readonly ILogger<AuthenticationHandler> logger;
 
@@ -18,7 +17,6 @@ namespace OfBot.Api.Pubg
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", settings.PubgApiKey);
             request.Headers.Add("Accept", "application/vnd.api+json");
 

@@ -1,7 +1,7 @@
 using Discord.Commands;
 using Microsoft.Extensions.Logging;
-using OfBot.Api;
 using OfBot.Api.Pubg;
+using OfBot.PubgTracker;
 using System.Text.RegularExpressions;
 
 namespace OfBot.Modules
