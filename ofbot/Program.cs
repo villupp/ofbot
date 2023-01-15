@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OfBot.Api.Dota;
 using OfBot.Api.Pubg;
+using OfBot.CommandHandlers.PubgStats;
 using OfBot.CommandHandlers.Registration;
 using OfBot.Components;
 using OfBot.Config;

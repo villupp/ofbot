@@ -5,7 +5,7 @@ using OfBot.Api.Pubg.Models;
 using OfBot.TableStorage;
 using OfBot.TableStorage.Models;
 
-namespace OfBot.CommandHandlers.Registration
+namespace OfBot.CommandHandlers.PubgStats
 {
     public class PubgStatsHandler
     {

@@ -1,6 +1,6 @@
 ﻿using Discord.Commands;
 using Microsoft.Extensions.Logging;
-using OfBot.CommandHandlers.Registration;
+using OfBot.CommandHandlers.PubgStats;
 
 namespace OfBot.Modules
 {
@@ -37,7 +37,8 @@ namespace OfBot.Modules
             var player = await pubgStatsHandler.GetPlayer(playerName);
             var season = await pubgStatsHandler.GetCurrentSeason();
 
-            if (player == null) {
+            if (player == null)
+            {
                 logger.LogInformation($"Could not retrieve player. Stats not posted.");
                 await ReplyAsync($"Player not found. Mind that player names are case-sensitive.");
                 return;
@@ -52,7 +53,7 @@ namespace OfBot.Modules
 
             var seasonStats = await pubgStatsHandler.GetRankedStats(player, season);
             var embed = pubgStatsHandler.CreateStatsEmded(player, season, seasonStats);
-            
+
             await ReplyAsync(null, embed: embed);
         }
 
