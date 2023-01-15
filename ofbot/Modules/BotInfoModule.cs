@@ -46,6 +46,10 @@ namespace OfBot.Modules
                 $"`{commandPrefix}b` without a session ID bumps your most recent session\n" +
                 $"To change description of your most recent registration session use:\n" +
                 $"`{commandPrefix}changedescription <new description>` or `{commandPrefix}cd <new description>`\n" +
+                $"PUBG ranked squad FPP stats can be queried by player name with the following command:\n" +
+                $"`{commandPrefix}pubgstats player <player name>` or `{commandPrefix}ps p <player name>`. Note that player names are case-sensitive.\n" +
+                $"Use `{commandPrefix}pubgstats refreshseasons` or `{commandPrefix}ps rs` to refresh season data cache. This has to be done when the season changes" +
+                $" to get stats for the latest season. This command might take a while to complete.\n" +
                 $"Custom commands use {customCommandPrefix} prefix.\nTo set (add or update) a custom command:\n`{customCommandPrefix}set <command name> <command content>`\n" +
                 $"To remove custom command:\n`{customCommandPrefix}remove <command name>`\n" +
                 $"To search for custom commands:\n`{customCommandPrefix}search <search input>` or `{customCommandPrefix}s <search input>`"
