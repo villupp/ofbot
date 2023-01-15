@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using OfBot.Common;
 using OfBot.Config;
 using OfBot.Api.Pubg.Models;
 using System.Net.Http.Json;

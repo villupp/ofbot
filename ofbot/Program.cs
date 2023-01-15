@@ -8,7 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OfBot.Api.Dota;
-using OfBot.Api.OpenDota;
 using OfBot.Api.Pubg;
 using OfBot.CommandHandlers;
 using OfBot.Components;

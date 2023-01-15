@@ -1,9 +1,9 @@
 using System.Net.Http.Json;
 using Microsoft.Extensions.Logging;
-using OfBot.Common;
+using OfBot.Api.OpenDota;
 using OfBot.Config;
 
-namespace OfBot.Api.OpenDota
+namespace OfBot.Api.Dota
 {
     public class OpenDotaApiClient : ApiClient
     {
@@ -22,7 +22,7 @@ namespace OfBot.Api.OpenDota
             }
             else
             {
-                this.LogHttpFailure(httpResponse); ;
+                LogHttpFailure(httpResponse); ;
                 throw new HttpRequestException();
             }
         }
