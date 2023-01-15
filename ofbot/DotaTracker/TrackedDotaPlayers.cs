@@ -1,6 +1,5 @@
 using OfBot.TableStorage.Models;
 using OfBot.TableStorage;
-using OfBot.Api.OpenDota;
 using OfBot.Api.Dota;
 using OfBot.DotaTracker.Models;
 

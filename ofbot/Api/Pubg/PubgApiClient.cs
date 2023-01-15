@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
-using OfBot.Common;
-using OfBot.Config;
 using OfBot.Api.Pubg.Models;
+using OfBot.Config;
 using System.Net.Http.Json;
 
 namespace OfBot.Api.Pubg
@@ -66,6 +65,57 @@ namespace OfBot.Api.Pubg
                 return players[0];
             else
                 return null;
+        }
+
+        public async Task<List<SeasonDetails>> GetSeasons()
+        {
+            logger.LogInformation($"GetSeasons");
+
+            var reqUri = $"seasons";
+            var httpResponse = await httpClient.GetAsync(reqUri);
+
+            if (!httpResponse.IsSuccessStatusCode)
+            {
+                if (httpResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    return null;
+
+                LogHttpFailure(httpResponse);
+
+                throw new HttpRequestException();
+            }
+
+            var seasonRes = await httpResponse.Content.ReadFromJsonAsync<SeasonResponse>();
+
+            return seasonRes.Seasons;
+        }
+
+        public async Task<RankedStats> GetRankedStats(string playerId, string seasonId)
+        {
+            logger.LogInformation($"GetRankedStats playerId '{playerId}', seasonId: '{seasonId}'");
+
+            if (string.IsNullOrEmpty(playerId)
+                || string.IsNullOrEmpty(seasonId))
+            {
+                logger.LogInformation($"GetRankedStats: missing one or more parameter.");
+                return null;
+            }
+
+            var reqUri = $"players/{playerId}/seasons/{seasonId}/ranked";
+            var httpResponse = await httpClient.GetAsync(reqUri);
+
+            if (!httpResponse.IsSuccessStatusCode)
+            {
+                if (httpResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    return null;
+
+                LogHttpFailure(httpResponse);
+
+                throw new HttpRequestException();
+            }
+
+            var rankedStatsRes = await httpResponse.Content.ReadFromJsonAsync<RankedStatsResponse>();
+
+            return rankedStatsRes.Stats;
         }
     }
 }

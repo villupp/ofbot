@@ -1,11 +1,11 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.Logging;
-using OfBot.CommandHandlers.Models;
+using OfBot.CommandHandlers.Registration.Models;
 using OfBot.Common;
 using System.Data;
 
-namespace OfBot.CommandHandlers
+namespace OfBot.CommandHandlers.Registration
 {
     public class RegistrationHandler
     {

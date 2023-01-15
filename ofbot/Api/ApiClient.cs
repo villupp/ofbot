@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using OfBot.Config;
 
-namespace OfBot.Common
+namespace OfBot.Api
 {
     public abstract class ApiClient
     {

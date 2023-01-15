@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 
-namespace OfBot.CommandHandlers.Models
+namespace OfBot.CommandHandlers.Registration.Models
 {
     public class RegistrationSession
     {
