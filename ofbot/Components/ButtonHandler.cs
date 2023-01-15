@@ -1,6 +1,6 @@
 ﻿using Discord.WebSocket;
 using Microsoft.Extensions.Logging;
-using OfBot.CommandHandlers;
+using OfBot.CommandHandlers.Registration;
 
 namespace OfBot.Components
 {

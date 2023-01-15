@@ -1,7 +1,7 @@
 ﻿using Discord.Commands;
 using Microsoft.Extensions.Logging;
-using OfBot.CommandHandlers;
-using OfBot.CommandHandlers.Models;
+using OfBot.CommandHandlers.Registration;
+using OfBot.CommandHandlers.Registration.Models;
 using OfBot.Common;
 using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 

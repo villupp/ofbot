@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 namespace OfBot.TableStorage
 {
     /* T should be a model class for the table with exact same name as table name in Azure Storage */
+
     public class TableStorageService<T> : ITableStorageService<T> where T : class, ITableEntity, new()
 
     {
@@ -74,6 +75,37 @@ namespace OfBot.TableStorage
             catch (Exception ex)
             {
                 logger.LogError($"Delete from table {typeof(T).Name} failed RowKey: {entity.RowKey}: {ex}");
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteAll()
+        {
+            logger.LogInformation($"Delete all {typeof(T).Name}");
+
+            try
+            {
+                var isSuccess = true;
+                var allEntities = await Get();
+
+                foreach (var entity in allEntities)
+                {
+                    try
+                    {
+                        await tableClient.DeleteEntityAsync(entity.PartitionKey, entity.RowKey);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError($"Delete from table {typeof(T).Name} failed RowKey: {entity.RowKey}: {ex}");
+                        isSuccess = false;
+                    }
+                }
+
+                return isSuccess;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"DeleteAll from table {typeof(T).Name} failed: {ex}");
                 return false;
             }
         }
