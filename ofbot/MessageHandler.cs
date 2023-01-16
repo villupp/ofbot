@@ -87,7 +87,7 @@ namespace OfBot
                 logger.LogInformation($"Got custom command search: '{message.Content}'");
                 await customCommandService.Search(message, context);
             }
-            else if (message.HasCharPrefix(CUSTOM_COMMAND_PREFIX, ref argPos))
+            else if (message.HasCharPrefix(CUSTOM_COMMAND_PREFIX, ref argPos) && message.Content?.Length > 1)
             {
                 // Execute custom command
                 // !<command>
