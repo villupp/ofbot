@@ -164,7 +164,7 @@ namespace OfBot.PubgTracker
                 var playerName = player.Attributes.Stats.Name;
                 var playerStats = player.Attributes.Stats;
 
-                playerStatsStr += $"[{playerName}](https://pubg.op.gg/user/{playerName}) " +
+                playerStatsStr += $"**[{playerName}](https://pubg.op.gg/user/{playerName})** " +
                     $"K: {playerStats.Kills}\tA: {playerStats.Assists}\tDMG: {string.Format("{0:0}", playerStats.DamageDealt)}\n";
             }
             var chicken = "";
@@ -176,7 +176,7 @@ namespace OfBot.PubgTracker
             embed.WithColor(color)
             .WithTitle($"{chicken}{playerNamesStr} finished #{winPlace} in a match of PUBG!")
             .WithDescription(
-                $"Map: {GetMapName(matchRes.Match.Attributes.MapName)}\n{playerStatsStr}");
+                $"Map: **{GetMapName(matchRes.Match.Attributes.MapName)}**\n{playerStatsStr}");
 
             await announcementService.Announce(
                 botSettings.AnnouncementGuild,
