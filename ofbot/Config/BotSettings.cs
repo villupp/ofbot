@@ -14,5 +14,6 @@
         public bool PubgTrackerIsEnabled { get; set; } = false;
         public int DotaTrackerPollingIntervalSeconds { get; set; } = 100000;
         public int PubgTrackerPollingIntervalSeconds { get; set; } = 100000;
+        public int PubgTrackerPlacementThreshold { get; set; } = 1;
     }
 }

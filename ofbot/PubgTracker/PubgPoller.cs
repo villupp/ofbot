@@ -109,14 +109,15 @@ namespace OfBot.PubgTracker
                     announceMatches.Add(matchRes);
             }
 
-            // Announce valid matches
+            // Announce valid matches only if winPlace <= PubgTrackerPlacementThreshold in config
             foreach (var matchRes in announceMatches)
             {
                 var announceRosters = new Dictionary<int, List<MatchPlayer>>();
 
                 var trackedMatchPlayers = matchRes.Players.Where(p =>
                     p?.Attributes?.Stats != null
-                    && trackedPlayerNames.Contains(p.Attributes.Stats.Name))
+                    && trackedPlayerNames.Contains(p.Attributes.Stats.Name)
+                    && p.Attributes.Stats.WinPlace <= botSettings.PubgTrackerPlacementThreshold)
                     .ToList();
                 var trackedWinPlaces = trackedMatchPlayers.Select(p => p.Attributes.Stats.WinPlace).Distinct();
 
