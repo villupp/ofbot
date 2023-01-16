@@ -87,12 +87,18 @@ namespace OfBot
                 logger.LogInformation($"Got custom command search: '{message.Content}'");
                 await customCommandService.Search(message, context);
             }
-            else if (message.HasCharPrefix(CUSTOM_COMMAND_PREFIX, ref argPos) && message.Content?.Length > 1)
+            else if (message.HasCharPrefix(CUSTOM_COMMAND_PREFIX, ref argPos))
             {
                 // Execute custom command
                 // !<command>
-                logger.LogInformation($"Executing custom command: '{message.Content}'");
-                await customCommandService.Execute(message, context);
+
+                // Only execute if contains other than the prefix character
+                var commandContent = message?.Content.Replace(CUSTOM_COMMAND_PREFIX.ToString(), "");
+                if (commandContent.Length > 0)
+                {
+                    logger.LogInformation($"Executing custom command: '{message.Content}'");
+                    await customCommandService.Execute(message, context);
+                }
             }
             else
             {
