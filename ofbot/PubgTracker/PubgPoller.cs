@@ -164,8 +164,11 @@ namespace OfBot.PubgTracker
                 var playerName = player.Attributes.Stats.Name;
                 var playerStats = player.Attributes.Stats;
 
-                playerStatsStr += $"**[{playerName}](https://pubg.op.gg/user/{playerName})** " +
-                    $"K: {playerStats.Kills}\tA: {playerStats.Assists}\tDMG: {string.Format("{0:0}", playerStats.DamageDealt)}\n";
+                var timeSurvived = TimeSpan.FromSeconds(playerStats.TimeSurvived);
+
+                playerStatsStr +=
+                    $"**[{playerName}](https://pubg.op.gg/user/{playerName})** " +
+                    $"K: **{playerStats.Kills}** A: **{playerStats.Assists}** DMG: **{string.Format("{0:0}", playerStats.DamageDealt)}** TS: **{timeSurvived:mm':'ss}**\n";
             }
             var chicken = "";
 
@@ -175,14 +178,34 @@ namespace OfBot.PubgTracker
             var embed = new EmbedBuilder();
             embed.WithColor(color)
             .WithTitle($"{chicken}{playerNamesStr} finished #{winPlace} in a match of PUBG!")
-            .WithDescription(
-                $"Map: **{GetMapName(matchRes.Match.Attributes.MapName)}**\n{playerStatsStr}");
+            .WithDescription($"Map: **{GetMapName(matchRes.Match.Attributes.MapName)}**\n{playerStatsStr}")
+            .WithThumbnailUrl(GetMapThumbnailUrl(matchRes.Match.Attributes.MapName))
+            ;
 
             await announcementService.Announce(
                 botSettings.AnnouncementGuild,
                 botSettings.AnnouncementChannel,
                 embed.Build()
             );
+        }
+
+        private string GetMapThumbnailUrl(string internalMapName)
+        {
+            return internalMapName switch
+            {
+                "Baltic_Main" => botSettings.PubgTrackerThumbnailUrlErangel,
+                "Chimera_Main" => "",
+                "Desert_Main" => botSettings.PubgTrackerThumbnailUrlMiramar,
+                "DihorOtok_Main" => "",
+                "Erangel_Main" => botSettings.PubgTrackerThumbnailUrlErangel,
+                "Heaven_Main" => "",
+                "Kiki_Main" => "",
+                "Range_Main" => "",
+                "Savage_Main" => "",
+                "Summerland_Main" => "",
+                "Tiger_Main" => botSettings.PubgTrackerThumbnailUrlTaego,
+                _ => "",
+            };
         }
 
         private string GetMapName(string internalMapName)

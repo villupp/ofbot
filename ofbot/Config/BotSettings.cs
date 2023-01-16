@@ -15,5 +15,9 @@
         public int DotaTrackerPollingIntervalSeconds { get; set; } = 100000;
         public int PubgTrackerPollingIntervalSeconds { get; set; } = 100000;
         public int PubgTrackerPlacementThreshold { get; set; } = 1;
+        public string PubgTrackerThumbnailUrlErangel { get; set; } = "";
+        public string PubgTrackerThumbnailUrlMiramar { get; set; } = "";
+        public string PubgTrackerThumbnailUrlTaego { get; set; } = "";
+        
     }
 }
