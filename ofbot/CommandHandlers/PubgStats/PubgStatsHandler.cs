@@ -55,15 +55,11 @@ namespace OfBot.CommandHandlers.PubgStats
                 kdrDisplay = string.Format("{0:0.0#}", kdr);
             }
 
-            statsStr += $"Rank: {stats.CurrentTier?.Tier} {GetSubTierRomanNumeral(stats.CurrentTier?.SubTier)} " +
-                $"(best: {stats.BestTier?.Tier} {GetSubTierRomanNumeral(stats.BestTier?.SubTier)})";
-            statsStr += $"\n{stats.RoundsPlayed} matches played";
-            statsStr += $"\n{stats.Wins} wins ({string.Format("{0:0.0#}", stats.WinRatio * 100)}%)";
-            statsStr += $"\nAverage rank: {string.Format("{0:0.0#}", stats.AvgRank)}";
-            statsStr += $"\nTop 10 ratio: {string.Format("{0:0.0#}", stats.Top10Ratio * 100)}%";
-            statsStr += $"\nKDR: {kdrDisplay}";
-            statsStr += $"\nKDA: {string.Format("{0:0.0#}", stats.Kda)}";
-            statsStr += $"\nAverage damage: {string.Format("{0:0}", stats.DamageDealt/stats.RoundsPlayed)}";
+            statsStr += $"Rank: **{stats.CurrentTier?.Tier} {GetSubTierRomanNumeral(stats.CurrentTier?.SubTier)}** " +
+                $"(best: **{stats.BestTier?.Tier} {GetSubTierRomanNumeral(stats.BestTier?.SubTier)}**)";
+            statsStr += $"\nMatches: **{stats.RoundsPlayed}** Wins: **{stats.Wins}** (**{string.Format("{0:0.0#}", stats.WinRatio * 100)}%**)";
+            statsStr += $"\nAverage rank: **{string.Format("{0:0.0#}", stats.AvgRank)}** Top 10: **{string.Format("{0:0.0#}", stats.Top10Ratio * 100)}%**";
+            statsStr += $"\nKDR: **{kdrDisplay}** KDA: **{string.Format("{0:0.0#}", stats.Kda)}** Avg dmg: **{string.Format("{0:0}", stats.DamageDealt/stats.RoundsPlayed)}**";
 
             var embedBuilder = new EmbedBuilder()
                  .WithTitle($"PUBG ranked season {seasonNumber} squad FPP stats for player {player.Name}")
