@@ -36,13 +36,16 @@ namespace OfBot.CommandHandlers.PubgStats
         {
             var statsStr = "";
             var seasonNumber = season.Id.Replace(SEASONID_PREFIX_PC, "");
+            var titleText = $"PUBG ranked season {seasonNumber} squad FPP stats for player {player.Name}";
+            var pubgOpGgUrl = $"https://pubg.op.gg/user/{player.Name}";
 
             if (rankedStats?.Attributes?.Stats?.SquadFpp == null)
             {
                 return new EmbedBuilder()
-                 .WithTitle($"PUBG ranked season {seasonNumber} squad FPP stats for player {player.Name}")
+                 .WithTitle(titleText)
                  .WithDescription($"No stats found :(")
                  .WithColor(Color.DarkGrey)
+                 .WithUrl(pubgOpGgUrl)
                  .Build();
             }
             var stats = rankedStats.Attributes.Stats.SquadFpp;
@@ -62,9 +65,10 @@ namespace OfBot.CommandHandlers.PubgStats
             statsStr += $"\nKDR: **{kdrDisplay}** KDA: **{string.Format("{0:0.0#}", stats.Kda)}** Avg dmg: **{string.Format("{0:0}", stats.DamageDealt/stats.RoundsPlayed)}**";
 
             var embedBuilder = new EmbedBuilder()
-                 .WithTitle($"PUBG ranked season {seasonNumber} squad FPP stats for player {player.Name}")
+                 .WithTitle(titleText)
                  .WithDescription(statsStr)
                  .WithColor(Color.Blue)
+                 .WithUrl(pubgOpGgUrl)
                  ;
 
             return embedBuilder.Build();
