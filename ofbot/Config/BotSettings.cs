@@ -10,6 +10,7 @@
         public string AnnouncementChannel { get; set; }
         public string PubgApiBaseUrl { get; set; }
         public string PubgApiKey { get; set; }
+        public string PubgStatsRankImageTemplateUrl { get; set; } = "";
         public bool DotaTrackerIsEnabled { get; set; } = false;
         public bool PubgTrackerIsEnabled { get; set; } = false;
         public int DotaTrackerPollingIntervalSeconds { get; set; } = 100000;

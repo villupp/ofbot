@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using OfBot.Api.Pubg;
 using OfBot.Api.Pubg.Models;
+using OfBot.Config;
 using OfBot.TableStorage;
 using OfBot.TableStorage.Models;
 
@@ -15,19 +16,22 @@ namespace OfBot.CommandHandlers.PubgStats
         private PubgApiClient pubgClient;
         private TableStorageService<PubgSeason> seasonTableService;
         private TableStorageService<PubgPlayer> playerTableService;
+        private BotSettings botSettings;
 
         public List<PubgSeason> Seasons { get; set; }
 
         public PubgStatsHandler(ILogger<PubgStatsHandler> logger,
             PubgApiClient pubgClient,
             TableStorageService<PubgSeason> seasonTableService,
-            TableStorageService<PubgPlayer> playerTableService
+            TableStorageService<PubgPlayer> playerTableService,
+            BotSettings botSettings
             )
         {
             this.logger = logger;
             this.pubgClient = pubgClient;
             this.seasonTableService = seasonTableService;
             this.playerTableService = playerTableService;
+            this.botSettings = botSettings;
 
             PopulateSeasons().Wait();
         }
@@ -69,6 +73,7 @@ namespace OfBot.CommandHandlers.PubgStats
                  .WithDescription(statsStr)
                  .WithColor(Color.Blue)
                  .WithUrl(pubgOpGgUrl)
+                 .WithThumbnailUrl(GetRankThumbnailUrl(stats.CurrentTier))
                  ;
 
             return embedBuilder.Build();
@@ -85,6 +90,27 @@ namespace OfBot.CommandHandlers.PubgStats
                 "5" => "I",
                 _ => "",
             };
+        }
+
+        private string GetRankThumbnailUrl(RankTier rankTier) {
+            //https://opgg-pubg-static.akamaized.net/images/tier/competitive/Platinum-5.png
+            if (rankTier == null || string.IsNullOrEmpty(botSettings.PubgStatsRankImageTemplateUrl))
+                return "";
+
+            var subTier = rankTier.SubTier switch
+            {
+                "1" => "5",
+                "2" => "4",
+                "3" => "3",
+                "4" => "2",
+                "5" => "1",
+                _ => "",
+            };
+
+            if (string.IsNullOrEmpty(rankTier.Tier) || string.IsNullOrEmpty(rankTier.SubTier))
+                return "";
+
+            return botSettings.PubgStatsRankImageTemplateUrl.Replace("{RANK}", $"{rankTier.Tier}-{subTier}");
         }
 
         private async Task PopulateSeasons()
