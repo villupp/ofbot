@@ -63,9 +63,9 @@ namespace OfBot.CommandHandlers.PubgStats
             }
 
             statsStr += $"Rank: **{stats.CurrentTier?.Tier} {GetSubTierRomanNumeral(stats.CurrentTier?.SubTier)}** " +
-                $"(best: **{stats.BestTier?.Tier} {GetSubTierRomanNumeral(stats.BestTier?.SubTier)}**)";
+                $"(season high: **{stats.BestTier?.Tier} {GetSubTierRomanNumeral(stats.BestTier?.SubTier)}**)";
             statsStr += $"\nMatches: **{stats.RoundsPlayed}** Wins: **{stats.Wins}** (**{string.Format("{0:0.0#}", stats.WinRatio * 100)}%**)";
-            statsStr += $"\nAverage rank: **{string.Format("{0:0.0#}", stats.AvgRank)}** Top 10: **{string.Format("{0:0.0#}", stats.Top10Ratio * 100)}%**";
+            statsStr += $"\nAvg placement: **#{string.Format("{0:0.0#}", stats.AvgRank)}** Top 10: **{string.Format("{0:0.0#}", stats.Top10Ratio * 100)}%**";
             statsStr += $"\nKDR: **{kdrDisplay}** KDA: **{string.Format("{0:0.0#}", stats.Kda)}** Avg dmg: **{string.Format("{0:0}", stats.DamageDealt/stats.RoundsPlayed)}**";
 
             var embedBuilder = new EmbedBuilder()

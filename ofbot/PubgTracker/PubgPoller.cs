@@ -168,7 +168,7 @@ namespace OfBot.PubgTracker
 
                 playerStatsStr +=
                     $"**[{playerName}](https://pubg.op.gg/user/{playerName})** " +
-                    $"K: **{playerStats.Kills}** A: **{playerStats.Assists}** DMG: **{string.Format("{0:0}", playerStats.DamageDealt)}** TS: **{timeSurvived:mm':'ss}**\n";
+                    $"K: **{playerStats.Kills}** A: **{playerStats.Assists}** Dmg: **{string.Format("{0:0}", playerStats.DamageDealt)}** TS: **{timeSurvived:mm':'ss}**\n";
             }
             var chicken = "";
 
