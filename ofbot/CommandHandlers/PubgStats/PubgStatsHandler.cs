@@ -83,11 +83,11 @@ namespace OfBot.CommandHandlers.PubgStats
         {
             return subTier switch
             {
-                "1" => "V",
-                "2" => "IV",
+                "1" => "I",
+                "2" => "II",
                 "3" => "III",
-                "4" => "II",
-                "5" => "I",
+                "4" => "IV",
+                "5" => "V",
                 _ => "",
             };
         }
@@ -97,20 +97,10 @@ namespace OfBot.CommandHandlers.PubgStats
             if (rankTier == null || string.IsNullOrEmpty(botSettings.PubgStatsRankImageTemplateUrl))
                 return "";
 
-            var subTier = rankTier.SubTier switch
-            {
-                "1" => "5",
-                "2" => "4",
-                "3" => "3",
-                "4" => "2",
-                "5" => "1",
-                _ => "",
-            };
-
             if (string.IsNullOrEmpty(rankTier.Tier) || string.IsNullOrEmpty(rankTier.SubTier))
                 return "";
 
-            return botSettings.PubgStatsRankImageTemplateUrl.Replace("{RANK}", $"{rankTier.Tier}-{subTier}");
+            return botSettings.PubgStatsRankImageTemplateUrl.Replace("{RANK}", $"{rankTier.Tier}-{rankTier.SubTier}");
         }
 
         private async Task PopulateSeasons()
