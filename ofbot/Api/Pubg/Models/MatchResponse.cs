@@ -152,7 +152,7 @@ namespace OfBot.Api.Pubg.Models
         public int TeamKills { get; set; }
 
         [JsonPropertyName("timeSurvived")]
-        public int TimeSurvived { get; set; }
+        public int? TimeSurvived { get; set; }
 
         [JsonPropertyName("vehicleDestroys")]
         public int VehicleDestroys { get; set; }

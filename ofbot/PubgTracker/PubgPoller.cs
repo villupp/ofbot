@@ -176,12 +176,17 @@ namespace OfBot.PubgTracker
             {
                 var playerName = player.Attributes.Stats.Name;
                 var playerStats = player.Attributes.Stats;
+                var timeSurvivedStr = "-";
 
-                var timeSurvived = TimeSpan.FromSeconds(playerStats.TimeSurvived);
+                if (playerStats.TimeSurvived.HasValue)
+                {
+                    var timeSurvived = TimeSpan.FromSeconds(playerStats.TimeSurvived.Value);
+                    timeSurvivedStr = $"{timeSurvived:mm':'ss}";
+                }
 
                 playerStatsStr +=
                     $"**[{playerName}](https://pubg.op.gg/user/{playerName})** " +
-                    $"K: **{playerStats.Kills}** A: **{playerStats.Assists}** Dmg: **{string.Format("{0:0}", playerStats.DamageDealt)}** TS: **{timeSurvived:mm':'ss}**\n";
+                    $"K: **{playerStats.Kills}** A: **{playerStats.Assists}** Dmg: **{string.Format("{0:0}", playerStats.DamageDealt)}** TS: **{timeSurvivedStr}**\n";
             }
             var chicken = "";
 
