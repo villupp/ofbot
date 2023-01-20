@@ -14,6 +14,8 @@ namespace OfBot.PubgTracker
         private readonly TrackedPubgPlayerManager trackedPlayerMngr;
         private readonly BotSettings botSettings;
 
+        private bool isPollerRunning;
+
         public PubgPoller(
             ILogger<PubgPoller> logger,
             AnnouncementService announcementService,
@@ -22,6 +24,7 @@ namespace OfBot.PubgTracker
             BotSettings botSettings
             )
         {
+            this.isPollerRunning = false;
             this.logger = logger;
             this.announcementService = announcementService;
             this.pubgClient = pubgClient;
@@ -31,11 +34,21 @@ namespace OfBot.PubgTracker
 
         public async Task Start()
         {
-            logger.LogInformation("Initializing tracked players list");
+            logger.LogInformation("PubgPoller.Start called");
+
+            if (isPollerRunning)
+            {
+                logger.LogInformation("PUBG poller is already running!");
+                return;
+            }
+
+            logger.LogInformation("Initializing tracked PUBG player list");
             await trackedPlayerMngr.Refresh();
 
             var timer = new PeriodicTimer(TimeSpan.FromSeconds(botSettings.PubgTrackerPollingIntervalSeconds));
             logger.LogInformation("PubgTracker polling service started");
+
+            isPollerRunning = true;
 
             do
             {

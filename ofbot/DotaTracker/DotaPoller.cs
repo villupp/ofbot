@@ -14,6 +14,8 @@ namespace OfBot.DotaTracker
         private readonly TrackedDotaPlayers trackedPlayers;
         private readonly BotSettings botSettings;
 
+        private bool isPollerRunning;
+
         public DotaPoller(
             ILogger<DotaPoller> logger,
             AnnouncementService announcementService,
@@ -27,15 +29,27 @@ namespace OfBot.DotaTracker
             this.dotaApiClient = dotaApi;
             this.trackedPlayers = trackedPlayers;
             this.botSettings = botSettings;
+            isPollerRunning = false;
         }
 
         public async Task Start()
         {
+            logger.LogInformation("DotaPoller.Start called");
+
+            if (isPollerRunning)
+            {
+                logger.LogInformation("DOTA poller is already running!");
+                return;
+            }
+
             logger.LogInformation("Initializing tracked players list");
             await trackedPlayers.Refresh();
 
             var timer = new PeriodicTimer(TimeSpan.FromSeconds(botSettings.DotaTrackerPollingIntervalSeconds));
             logger.LogInformation("DotaTracker polling service started");
+
+            isPollerRunning = true;
+
             do
             {
                 try
