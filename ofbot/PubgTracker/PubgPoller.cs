@@ -180,7 +180,7 @@ namespace OfBot.PubgTracker
 
                 if (playerStats.TimeSurvived.HasValue)
                 {
-                    var timeSurvived = TimeSpan.FromSeconds(playerStats.TimeSurvived.Value);
+                    var timeSurvived = TimeSpan.FromSeconds(decimal.ToDouble(playerStats.TimeSurvived.Value));
                     timeSurvivedStr = $"{timeSurvived:mm':'ss}";
                 }
 
