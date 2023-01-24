@@ -3,14 +3,13 @@ using Microsoft.Extensions.Logging;
 using OfBot.CommandHandlers.Registration;
 using OfBot.CommandHandlers.Registration.Models;
 using OfBot.Common;
-using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace OfBot.Modules
 {
     public class RegistrationModule : ModuleBase<SocketCommandContext>
     {
-        private ILogger logger;
-        private RegistrationHandler registrationHandler;
+        private readonly ILogger logger;
+        private readonly RegistrationHandler registrationHandler;
 
         public RegistrationModule(ILogger<RegistrationModule> logger, RegistrationHandler registrationHandler)
         {

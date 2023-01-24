@@ -1,6 +1,6 @@
 using Discord.Commands;
-using OfBot.DotaTracker;
 using Microsoft.Extensions.Logging;
+using OfBot.DotaTracker;
 using System.Text.RegularExpressions;
 
 namespace OfBot.Modules
@@ -9,8 +9,9 @@ namespace OfBot.Modules
     [Alias("dt", "dota")]
     public class DotaTrackerModule : ModuleBase<SocketCommandContext>
     {
-        private ILogger logger;
-        private TrackedDotaPlayers playerStates;
+        private readonly ILogger logger;
+        private readonly TrackedDotaPlayers playerStates;
+
         public DotaTrackerModule(
             ILogger<DotaTrackerModule> logger,
             TrackedDotaPlayers playerStates
@@ -23,7 +24,7 @@ namespace OfBot.Modules
         // Replies with help for dotatracker component
         // -dotatracker help
         [Command("help")]
-        [Alias("")]
+        [Alias("h", "?", "info")]
         [Summary("Help command for dotatracker component.")]
         public async Task Help()
         {
@@ -36,9 +37,9 @@ namespace OfBot.Modules
         }
 
         // Track a new dota player
-        // -dotatracker track 
+        // -dotatracker track
         [Command("track")]
-        [Alias("add")]
+        [Alias("add", "a")]
         [Summary("Track a new player.")]
         public async Task Track(
             [Remainder][Summary("Dota player account id")] string accountId)
@@ -63,11 +64,10 @@ namespace OfBot.Modules
             }
         }
 
-
         // Remove an existing tracked player
-        // -dotatracker untrack 
+        // -dotatracker untrack
         [Command("untrack")]
-        [Alias("remove")]
+        [Alias("remove", "r")]
         [Summary("Untrack an existing player.")]
         public async Task Untrack(
             [Remainder][Summary("Dota player account id")] string accountId)
@@ -85,9 +85,9 @@ namespace OfBot.Modules
         }
 
         // Remove an existing tracked player
-        // -dotatracker untrack 
+        // -dotatracker untrack
         [Command("list")]
-        [Alias("get")]
+        [Alias("get", "l")]
         [Summary("Get all tracked players.")]
         public async Task List()
         {

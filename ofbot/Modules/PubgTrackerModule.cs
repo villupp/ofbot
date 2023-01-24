@@ -1,6 +1,5 @@
 using Discord.Commands;
 using Microsoft.Extensions.Logging;
-using OfBot.Api.Pubg;
 using OfBot.PubgTracker;
 using System.Text.RegularExpressions;
 
@@ -10,19 +9,16 @@ namespace OfBot.Modules
     [Alias("pt")]
     public class PubgTrackerModule : ModuleBase<SocketCommandContext>
     {
-        private ILogger logger;
-        private TrackedPubgPlayerManager trackedPlayerMngr;
-        private PubgApiClient pubgClient;
+        private readonly ILogger logger;
+        private readonly TrackedPubgPlayerManager trackedPlayerMngr;
 
         public PubgTrackerModule(
             ILogger<PubgTrackerModule> logger,
-            TrackedPubgPlayerManager trackedPlayerMngr,
-            PubgApiClient pubgClient
+            TrackedPubgPlayerManager trackedPlayerMngr
             )
         {
             this.logger = logger;
             this.trackedPlayerMngr = trackedPlayerMngr;
-            this.pubgClient = pubgClient;
         }
 
         // Replies with help for pubgtracker component
@@ -43,7 +39,7 @@ namespace OfBot.Modules
         // Track a new dota player
         // -pubgtracker track
         [Command("track")]
-        [Alias("add")]
+        [Alias("add", "a")]
         [Summary("Track a new player.")]
         public async Task Track(
             [Remainder][Summary("Pubg player name")] string playerName)
@@ -83,7 +79,7 @@ namespace OfBot.Modules
         }
 
         [Command("list")]
-        [Alias("l")]
+        [Alias("l", "get")]
         [Summary("Get all tracked players.")]
         public async Task List()
         {
