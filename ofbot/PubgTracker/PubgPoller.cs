@@ -80,7 +80,10 @@ namespace OfBot.PubgTracker
                 PlayerMatch recentMatch;
                 var trackingState = trackedPlayerMngr.trackedPlayers.Where(ts => ts.Player.Name == player.Attributes.Name).FirstOrDefault();
 
-                recentMatch = player.Relationships?.Matches.Data?[0] ?? null;
+                var matches = player.Relationships?.Matches?.Data;
+                recentMatch = matches.Count > 0 ? matches[0] : null;
+
+                if (recentMatch == null) continue;
 
                 /* Latest match id is always initially null, initial update (from null to a valid match id) will
                    not trigger an announcement. An announcement about a new detected match is made when the latest
