@@ -1,4 +1,4 @@
-﻿using Discord.Commands;
+﻿using Discord.Interactions;
 using Microsoft.Extensions.Logging;
 using OfBot.CommandHandlers.Registration;
 using OfBot.CommandHandlers.Registration.Models;
@@ -6,7 +6,8 @@ using OfBot.Common;
 
 namespace OfBot.Modules
 {
-    public class RegistrationModule : ModuleBase<SocketCommandContext>
+    [Group("registration", "")]
+    public class RegistrationModule : InteractionModuleBase<SocketInteractionContext>
     {
         private readonly ILogger logger;
         private readonly RegistrationHandler registrationHandler;
@@ -18,17 +19,12 @@ namespace OfBot.Modules
         }
 
         // Starts new registration session
-        // -registration <optional custom description>
-        // -registration dotkkaa klo 16?
-        [Command("registration")]
-        [Summary("Initiates a registration message with registration buttons.")]
-        [Alias("dotaa", "dota", "cs", "jengi", "letsplay", "reg", "peliä", "matsi", "roster", "rosteri", "pubg", "lineup", "r", "reg", "game", "g")]
-        public async Task StartRegistration([Summary("Optional button description.")] params string[] descParams)
+        [SlashCommand("create", "")]
+        public async Task StartRegistration(string description = null)
         {
-            var description = string.Join(" ", descParams);
             description = StringHelpers.RemoveDiscordMarkdown(description);
 
-            logger.LogInformation($"Registration initiated by {Context.User.Username}: {description}");
+            logger.LogInformation($"Registration initiated by {Context.User.Username}: '{description}'");
 
             var registerButtonId = Guid.NewGuid();
             var commentButtonId = Guid.NewGuid();
@@ -44,25 +40,18 @@ namespace OfBot.Modules
             var msg = await ReplyAsync(null, components: btnComponent, embed: embed);
             session.Message = msg;
 
-            await Context.Message.DeleteAsync();
+            await RespondAsync("Created.", ephemeral: true);
         }
 
         // Reposts new registration session
-        // -bump 1 (with ID)
-        // -bump (fetches most recent session by user)
-        // Short alias:
-        // -b 1
-        // -b
-        [Command("bump")]
-        [Summary("Reposts a registration session.")]
-        [Alias("b", "repost")]
-        public async Task Repost([Summary("ID of the registration session to repost.")] int? sessionId = null)
+        [SlashCommand("bump", "")]
+        public async Task Repost(int? sessionid = null)
         {
-            logger.LogInformation($"Repost session ID {(!sessionId.HasValue ? "<not given>" : sessionId)} initiated");
+            logger.LogInformation($"Repost session ID {(!sessionid.HasValue ? "<not given>" : sessionid)} initiated");
 
             RegistrationSession session = null;
 
-            if (sessionId == null)
+            if (sessionid == null)
             {
                 session = registrationHandler.Sessions
                     .Where(s => s.CreatedBy.Username.ToLower() == Context.User.Username.ToLower())
@@ -73,11 +62,11 @@ namespace OfBot.Modules
                     logger.LogInformation($"Found recent session by {Context.User.Username}, ID {session.Id}");
             }
             else
-                session = registrationHandler.Sessions.Where(s => s.Id == sessionId).FirstOrDefault();
+                session = registrationHandler.Sessions.Where(s => s.Id == sessionid).FirstOrDefault();
 
             if (session == null)
             {
-                var errMsg = $"Cannot find valid session {(sessionId.HasValue ? $" with ID {sessionId}" : "")}";
+                var errMsg = $"Cannot find valid session {(sessionid.HasValue ? $" with ID {sessionid}" : "")}";
                 logger.LogInformation(errMsg);
                 await ReplyAsync(errMsg);
                 return;
@@ -95,20 +84,13 @@ namespace OfBot.Modules
             var sessionMessage = await ReplyAsync(null, components: btnComponent, embed: embed);
             session.Message = sessionMessage;
 
-            await Context.Message.DeleteAsync();
+            await RespondAsync("Bumped.", ephemeral: true);
         }
 
         // Changes registration session description
-        // -cd <description>
-        // -changedescription <description>
-        // -cd initial description
-        // -changedescription new description
-        [Command("changedescription")]
-        [Summary("Changes description of user's most recent registration session.")]
-        [Alias("cd", "description", "desc")]
-        public async Task ChangeDescription([Summary("Session description.")] params string[] descParams)
+        [SlashCommand("changedescription", "")]
+        public async Task ChangeDescription(string description)
         {
-            var description = string.Join(" ", descParams);
             description = StringHelpers.RemoveDiscordMarkdown(description);
 
             logger.LogInformation($"Registration session description change to '{description}' initiated by {Context.User.Username}.");
@@ -131,6 +113,8 @@ namespace OfBot.Modules
             logger.LogInformation($"Changed description of most recent session by {Context.User.Username}, ID {session.Id} to '{description}'. Reposting..");
 
             await Repost(session.Id);
+
+            await RespondAsync("Description changed.", ephemeral: true);
         }
     }
 }

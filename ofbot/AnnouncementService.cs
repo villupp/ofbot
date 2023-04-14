@@ -24,7 +24,8 @@ namespace OfBot
             await GetChannel(guildName, channelName).SendMessageAsync(messageContent);
         }
 
-        public async Task Announce(string guildName, string channelName, Embed embed) {
+        public async Task Announce(string guildName, string channelName, Embed embed)
+        {
             logger.LogInformation($"Sending message to channel '{guildName}/{channelName}' with custom embed content'");
             await GetChannel(guildName, channelName).SendMessageAsync(embed: embed);
         }

@@ -1,5 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord.Interactions;
+using Discord.Net;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -18,6 +20,7 @@ namespace OfBot
         private readonly BotSettings botSettings;
         private readonly DiscordSocketClient discordSocketClient;
         private readonly CommandService commandService;
+        private readonly InteractionService interactionService;
         private readonly IServiceProvider serviceProvider;
         private readonly ButtonHandler buttonHandler;
         private readonly ModalHandler modalHandler;
@@ -30,6 +33,7 @@ namespace OfBot
             BotSettings botSettings,
             DiscordSocketClient discordSocketClient,
             CommandService commandService,
+            InteractionService interactionService,
             IServiceProvider serviceProvider,
             ButtonHandler buttonHandler,
             ModalHandler modalHandler,
@@ -45,6 +49,7 @@ namespace OfBot
             this.botSettings = botSettings;
             this.discordSocketClient = discordSocketClient;
             this.commandService = commandService;
+            this.interactionService = interactionService;
             this.serviceProvider = serviceProvider;
             this.buttonHandler = buttonHandler;
             this.modalHandler = modalHandler;
@@ -80,6 +85,95 @@ namespace OfBot
                     logger.LogInformation("Starting PUBG tracker polling service");
                     _ = pubgPoller.Start().ConfigureAwait(false);
                 }
+
+                var slashCommands = new List<SlashCommandBuilder>
+                {
+                    new SlashCommandBuilder()
+                        .WithName("say")
+                        .WithDescription("Make me say something.")
+                        .AddOption("message", ApplicationCommandOptionType.String, "Message", isRequired: true),
+                    new SlashCommandBuilder()
+                        .WithName("git")
+                        .WithDescription("Link to ofbot git version control."),
+                    new SlashCommandBuilder()
+                        .WithName("help")
+                        .WithDescription("Provides general information about bot."),
+                    new SlashCommandBuilder()
+                        .WithName("dotatracker")
+                        .WithDescription("DOTA tracker related commands.")
+                        .AddOption(new SlashCommandOptionBuilder()
+                            .WithName("track")
+                            .WithDescription("Track a new player.")
+                            .WithType(ApplicationCommandOptionType.SubCommand)
+                            .AddOption("accountid", ApplicationCommandOptionType.String, "DOTA player account ID", isRequired: true))
+                        .AddOption(new SlashCommandOptionBuilder()
+                            .WithName("untrack")
+                            .WithDescription("Untrack a tracked player.")
+                            .WithType(ApplicationCommandOptionType.SubCommand)
+                            .AddOption("accountid", ApplicationCommandOptionType.String, "DOTA player account ID", isRequired: true))
+                        .AddOption(new SlashCommandOptionBuilder()
+                            .WithName("list")
+                            .WithDescription("List all tracked players.")
+                            .WithType(ApplicationCommandOptionType.SubCommand)),
+                    new SlashCommandBuilder()
+                        .WithName("pubgtracker")
+                        .WithDescription("PUBG tracker related commands.")
+                        .AddOption(new SlashCommandOptionBuilder()
+                            .WithName("track")
+                            .WithDescription("Track a new player.")
+                            .WithType(ApplicationCommandOptionType.SubCommand)
+                            .AddOption("playername", ApplicationCommandOptionType.String, "PUBG player name (case sensitive)", isRequired: true))
+                        .AddOption(new SlashCommandOptionBuilder()
+                            .WithName("untrack")
+                            .WithDescription("Untrack a tracked player.")
+                            .WithType(ApplicationCommandOptionType.SubCommand)
+                            .AddOption("playername", ApplicationCommandOptionType.String, "PUBG player name (case sensitive)", isRequired: true))
+                        .AddOption(new SlashCommandOptionBuilder()
+                            .WithName("list")
+                            .WithDescription("List all tracked players.")
+                            .WithType(ApplicationCommandOptionType.SubCommand)),
+                    new SlashCommandBuilder()
+                        .WithName("pubgstats")
+                        .WithDescription("PUBG stats related commands.")
+                        .AddOption(new SlashCommandOptionBuilder()
+                            .WithName("player")
+                            .WithDescription("Get player stats for current ranked season (squad FPP).")
+                            .WithType(ApplicationCommandOptionType.SubCommand)
+                            .AddOption("playername", ApplicationCommandOptionType.String, "PUBG player name (case sensitive)", isRequired: true)
+                            .AddOption("ispublic", ApplicationCommandOptionType.Boolean, "Announce stats in public response"))
+                        .AddOption(new SlashCommandOptionBuilder()
+                            .WithName("refreshseasons")
+                            .WithDescription("Refreshes season cache. Might take some time to complete.")
+                            .WithType(ApplicationCommandOptionType.SubCommand)),
+                    new SlashCommandBuilder()
+                        .WithName("registration")
+                        .WithDescription("Create a new registration session.")
+                        .AddOption(new SlashCommandOptionBuilder()
+                            .WithName("create")
+                            .WithDescription("Creates a new registration session.")
+                            .WithType(ApplicationCommandOptionType.SubCommand)
+                            .AddOption("description", ApplicationCommandOptionType.String, "Session description"))
+                        .AddOption(new SlashCommandOptionBuilder()
+                            .WithName("bump")
+                            .WithDescription("Reposts a registration session.")
+                            .WithType(ApplicationCommandOptionType.SubCommand)
+                            .AddOption("sessionid", ApplicationCommandOptionType.String, "Session ID"))
+                        .AddOption(new SlashCommandOptionBuilder()
+                            .WithName("changedescription")
+                            .WithDescription("Changes description of your most recent registration session.")
+                            .WithType(ApplicationCommandOptionType.SubCommand)
+                            .AddOption("description", ApplicationCommandOptionType.String, "Session description", isRequired: true))
+                };
+
+                try
+                {
+                    foreach (var slashCmd in slashCommands)
+                        await discordSocketClient.Rest.CreateGuildCommand(slashCmd.Build(), botSettings.PrimaryGuildId);
+                }
+                catch (HttpException ex)
+                {
+                    logger.LogError($"Error while creating slash commands: {ex}");
+                }
             };
 
             discordSocketClient.ButtonExecuted += buttonHandler.OnButtonExecuted;
@@ -100,9 +194,25 @@ namespace OfBot
 
             var messageHandler = serviceProvider.GetService<MessageHandler>();
             discordSocketClient.MessageReceived += messageHandler.Handle;
+            discordSocketClient.SlashCommandExecuted += HandleSlashCommand;
 
             await commandService.AddModulesAsync(
                 assembly: Assembly.GetEntryAssembly(),
+                services: serviceProvider);
+
+            await interactionService.AddModulesAsync(
+                assembly: Assembly.GetEntryAssembly(),
+                services: serviceProvider);
+        }
+
+        private async Task HandleSlashCommand(SocketSlashCommand slashCommand)
+        {
+            logger.LogInformation($"slash command {slashCommand.CommandName} executed");
+
+            var context = new SocketInteractionContext(discordSocketClient, slashCommand);
+
+            await interactionService.ExecuteCommandAsync(
+                context: context,
                 services: serviceProvider);
         }
 

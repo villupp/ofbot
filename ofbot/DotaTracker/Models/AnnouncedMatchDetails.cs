@@ -8,6 +8,7 @@ namespace OfBot.DotaTracker
         Radiant,
         Dire,
     }
+
     public class AnnouncedMatchDetails
     {
         private Int64 matchId;
@@ -41,6 +42,7 @@ namespace OfBot.DotaTracker
             this.scoreDire = response.result.dire_score;
             this.gameLength = TimeSpan.FromSeconds(response.result.duration);
         }
+
         public Embed BuildEmbed()
         {
             var playerNames = String.Join(
@@ -57,7 +59,8 @@ namespace OfBot.DotaTracker
             var radiantResultText = $"[" + (this.winner == Team.Radiant ? "W" : "L") + $"] {this.scoreRadiant}";
             var direResultText = $"{this.scoreDire} [" + (this.winner == Team.Dire ? "W" : "L") + "]";
             var gameTime = "";
-            if (this.gameLength.Hours > 0) {
+            if (this.gameLength.Hours > 0)
+            {
                 gameTime += this.gameLength.ToString(@"hh\:");
             }
             gameTime += this.gameLength.ToString(@"mm\:");
@@ -67,7 +70,7 @@ namespace OfBot.DotaTracker
             embed.WithColor(isWin ? Color.DarkGreen : Color.DarkRed)
             .WithTitle($"{playerNames} played a match of Dota!")
             .WithDescription(
-                $"**{gameResultText}** in {gameTime}\n" + 
+                $"**{gameResultText}** in {gameTime}\n" +
                 $"{radiantResultText} - {direResultText}\n" +
                 $"[OpenDota]({opendotaLink}) | [DOTABUFF]({dotabuffLink})")
             .WithUrl(opendotaLink);

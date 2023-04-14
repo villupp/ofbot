@@ -111,13 +111,13 @@ namespace OfBot
             }
 
             var commandName = ParseCustomCommandName(messageParts[1]);
-            
+
             if (!Regex.IsMatch(commandName, "^[a-zöäå0-9]*$", RegexOptions.IgnoreCase))
             {
                 await context.Channel.SendMessageAsync($"Invalid command name. Command name may only contain letters and numbers.");
                 return false;
             }
-            
+
             var commandContent = string.Join(' ', messageParts.Skip(2).ToArray());
 
             logger.LogInformation($"Setting command '{commandName}' to '{commandContent}'");
