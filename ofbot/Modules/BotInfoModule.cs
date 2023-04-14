@@ -28,18 +28,7 @@ namespace OfBot.Modules
 
             var commandPrefix = MessageHandler.COMMAND_PREFIX;
             var customCommandPrefix = MessageHandler.CUSTOM_COMMAND_PREFIX;
-            await RespondAsync($"**Some useful commands:** `/git`, `/help`\n" +
-                $"**To create a registration/lineup session:**\n" +
-                $"`{commandPrefix}reg <event description>` or `{commandPrefix}r <event description>`\n" +
-                $"**To bump your session use:\n**" +
-                $"`{commandPrefix}bump <event ID>` or `{commandPrefix}b <event ID>`\n" +
-                $"`{commandPrefix}b` without a session ID bumps your most recent session\n" +
-                $"**To change description of your most recent registration session use:**\n" +
-                $"`{commandPrefix}changedescription <new description>` or `{commandPrefix}cd <new description>`\n" +
-                $"**PUBG ranked squad FPP stats can be queried by player name with the following command:**\n" +
-                $"`{commandPrefix}pubgstats player <player name>` or `{commandPrefix}ps p <player name>`. Note that player names are case-sensitive.\n" +
-                $"**Use `{commandPrefix}pubgstats refreshseasons` or `{commandPrefix}ps rs` to refresh season data cache. This has to be done when the season changes" +
-                $" to get stats for the latest season. This command might take a while to complete.**\n" +
+            await RespondAsync($"**Some useful commands:** `/git`, `/help`, `/registration`, `/pubgstats`, `/dotatracker`, `/pubgtracker` \n" +
                 $"**Custom commands use {customCommandPrefix} prefix.**\n" +
                 $"**To set (add or update) a custom command:**\n`{customCommandPrefix}set <command name> <command content>`\n" +
                 $"**To remove custom command:**\n`{customCommandPrefix}remove <command name>`\n" +

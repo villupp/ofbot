@@ -172,7 +172,7 @@ namespace OfBot
                 }
                 catch (HttpException ex)
                 {
-                    logger.LogError($"Error while creating command: {ex}");
+                    logger.LogError($"Error while creating slash commands: {ex}");
                 }
             };
 
