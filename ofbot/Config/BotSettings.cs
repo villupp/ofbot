@@ -19,6 +19,7 @@
         public string PubgTrackerThumbnailUrlErangel { get; set; } = "";
         public string PubgTrackerThumbnailUrlMiramar { get; set; } = "";
         public string PubgTrackerThumbnailUrlTaego { get; set; } = "";
-        
+        public string PubgTrackerThumbnailUrlDeston { get; set; } = "";
+
     }
 }

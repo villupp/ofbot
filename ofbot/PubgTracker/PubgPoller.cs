@@ -220,7 +220,7 @@ namespace OfBot.PubgTracker
                 "DihorOtok_Main" => "",
                 "Erangel_Main" => botSettings.PubgTrackerThumbnailUrlErangel,
                 "Heaven_Main" => "",
-                "Kiki_Main" => "",
+                "Kiki_Main" => botSettings.PubgTrackerThumbnailUrlDeston,
                 "Range_Main" => "",
                 "Savage_Main" => "",
                 "Summerland_Main" => "",
