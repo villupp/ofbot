@@ -1,6 +1,6 @@
-using System.Net.Http.Json;
 using Microsoft.Extensions.Logging;
 using OfBot.Config;
+using System.Net.Http.Json;
 
 namespace OfBot.Api.Dota
 {
@@ -29,7 +29,7 @@ namespace OfBot.Api.Dota
             }
             else
             {
-                this.LogHttpFailure(httpResponse);;
+                this.LogHttpFailure(httpResponse); ;
                 throw new HttpRequestException();
             }
         }
@@ -44,7 +44,7 @@ namespace OfBot.Api.Dota
             };
             var pathParamsText = String.Join("&", pathParams);
             string path = $"{endpoint}?{pathParamsText}";
-            var httpResponse = await httpClient.GetAsync(path); 
+            var httpResponse = await httpClient.GetAsync(path);
             if (httpResponse.IsSuccessStatusCode)
             {
                 var getMatchDetailsResponse = await httpResponse.Content.ReadFromJsonAsync<GetMatchDetailsResponse>();

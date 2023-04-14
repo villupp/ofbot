@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Azure;
@@ -43,6 +44,10 @@ namespace OfBot
                     CaseSensitiveCommands = false
                 };
 
+                var interactionServiceConfig = new InteractionServiceConfig()
+                {
+                };
+
                 services.AddAzureClients(builder =>
                 {
                     builder.AddTableServiceClient(botSettings.StorageKey);
@@ -54,8 +59,10 @@ namespace OfBot
                 services.AddSingleton(botSettings);
                 services.AddSingleton(discordSocketConfig);
                 services.AddSingleton(commandServiceConfig);
+                services.AddSingleton(interactionServiceConfig);
                 services.AddSingleton<DiscordSocketClient>();
                 services.AddSingleton<CommandService>();
+                services.AddSingleton<InteractionService>();
                 services.AddSingleton<CustomCommandService>();
                 services.AddSingleton<MessageHandler>();
                 services.AddSingleton<TableStorageService<Command>>();

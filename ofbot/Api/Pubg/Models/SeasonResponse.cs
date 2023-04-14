@@ -28,6 +28,4 @@ namespace OfBot.Api.Pubg.Models
         [JsonPropertyName("data")]
         public List<SeasonDetails> Seasons { get; set; }
     }
-
-
 }

@@ -1,7 +1,7 @@
-using OfBot.TableStorage.Models;
-using OfBot.TableStorage;
 using OfBot.Api.Dota;
 using OfBot.DotaTracker.Models;
+using OfBot.TableStorage;
+using OfBot.TableStorage.Models;
 
 namespace OfBot.DotaTracker
 {
@@ -23,6 +23,7 @@ namespace OfBot.DotaTracker
             this.dotaApi = dotaApi;
             this.openDotaApi = openDotaApi;
         }
+
         public async Task<TrackedDotaPlayer> Add(string accountId, string addedBy)
         {
             var player = await this.Exists(accountId);
@@ -52,6 +53,7 @@ namespace OfBot.DotaTracker
             });
             return trackedPlayer;
         }
+
         public async Task<TrackedDotaPlayer> Remove(string accountId)
         {
             var player = await this.Exists(accountId);
@@ -63,6 +65,7 @@ namespace OfBot.DotaTracker
             this.trackingStates.Remove(this.trackingStates.FirstOrDefault(state => state.player.AccountId == accountId));
             return player;
         }
+
         private async Task<TrackedDotaPlayer> Exists(string accountId)
         {
             var existingPlayers = await tableService.Get(
@@ -73,6 +76,7 @@ namespace OfBot.DotaTracker
             }
             return null;
         }
+
         public async Task Refresh()
         {
             var players = await tableService.Get(trackedDotaPlayer => true);

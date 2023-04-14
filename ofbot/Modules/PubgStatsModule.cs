@@ -1,12 +1,11 @@
-﻿using Discord.Commands;
+﻿using Discord.Interactions;
 using Microsoft.Extensions.Logging;
 using OfBot.CommandHandlers.PubgStats;
 
 namespace OfBot.Modules
 {
-    [Group("pubgstats")]
-    [Alias("ps")]
-    public class PubgStatsModule : ModuleBase<SocketCommandContext>
+    [Group("pubgstats", "")]
+    public class PubgStatsModule : InteractionModuleBase<SocketInteractionContext>
     {
         private readonly ILogger logger;
         private PubgStatsHandler pubgStatsHandler;
@@ -17,66 +16,62 @@ namespace OfBot.Modules
             this.pubgStatsHandler = pubgStatsHandler;
         }
 
-        // Posts PUBG player stats for ongoing season
-        // -pubgstats player <playerName>
-        // -pubgstats p <playerName>
-        // -pubgstats p villu --> stats info
-        [Command("player")]
-        [Summary("Prints PUBG player stats (ongoing season).")]
-        [Alias("p")]
-        public async Task CurrentSeasonStats([Summary("PUBG player name")] string playerName)
+        // Posts PUBG player stats for current ongoing season
+        [SlashCommand("player", "")]
+        public async Task CurrentSeasonStats(string playername, bool ispublic = false)
         {
-            logger.LogInformation($"CurrentSeasonStats initiated by {Context.User.Username} for player '{playerName}'");
+            logger.LogInformation($"CurrentSeasonStats initiated by {Context.User.Username} for player '{playername}'");
 
-            if (string.IsNullOrEmpty(playerName))
+            if (string.IsNullOrEmpty(playername))
             {
-                await ReplyAsync($"Provide a player name. For example: `-pubgstats villu`");
+                await RespondAsync($"Provide a player name. For example: `-pubgstats villu`");
                 return;
             }
 
-            var player = await pubgStatsHandler.GetPlayer(playerName);
+            var player = await pubgStatsHandler.GetPlayer(playername);
             var season = await pubgStatsHandler.GetCurrentSeason();
 
             if (player == null)
             {
                 logger.LogInformation($"Could not retrieve player. Stats not posted.");
-                await ReplyAsync($"Player not found. Mind that player names are case-sensitive.");
+                await RespondAsync($"Player not found.");
                 return;
             }
 
             if (season == null)
             {
                 logger.LogInformation($"Could not retrieve current season. Stats not posted.");
-                await ReplyAsync($"Ranked season not found. There might be an issue. Use `-pubgstats rs` to refresh season cache.");
+                await RespondAsync($"Ranked season not found. There might be an issue. Use `-pubgstats rs` to refresh season cache.");
                 return;
             }
 
             var seasonStats = await pubgStatsHandler.GetRankedStats(player, season);
             var embed = pubgStatsHandler.CreateStatsEmded(player, season, seasonStats);
 
-            await ReplyAsync(null, embed: embed);
+            if (ispublic)
+                await RespondAsync(null, embed: embed);
+            else
+                await RespondAsync(null, null, false, true, embed: embed);
         }
 
         // Refreshes season cache
-        // -pubgstats refreshseasons
-        // -pubgstats rs
-        [Command("refreshseasons")]
-        [Summary("Refreshes PUBG season cache.")]
-        [Alias("rs")]
+        [SlashCommand("refreshseasons", "")]
         public async Task RefreshSeasons()
         {
             logger.LogInformation($"Refresh PUBG seasons initiated by {Context.User.Username}");
+
+            await DeferAsync();
 
             var success = await pubgStatsHandler.RefreshSeasonCache();
 
             if (success)
             {
-                await ReplyAsync($"Season cache refreshed.");
+                await ModifyOriginalResponseAsync((msg) => msg.Content = $"Season cache refreshed.");
                 logger.LogInformation($"Season cache refresh successful");
             }
             else
             {
-                await ReplyAsync($"Season cache refresh failed. See logs for details.");
+                await ModifyOriginalResponseAsync((msg) => msg.Content = $"Season cache refresh failed. See logs for details.");
                 logger.LogInformation($"Season cache refresh failed");
             }
         }

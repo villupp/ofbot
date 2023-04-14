@@ -19,7 +19,7 @@ namespace OfBot.Components
         {
             logger.LogInformation($"Modal ID '{modal.Data.CustomId}' was submitted by {modal.User.Username}");
 
-             if (!Guid.TryParse(modal.Data.CustomId, out var modalCustomId))
+            if (!Guid.TryParse(modal.Data.CustomId, out var modalCustomId))
                 return;
 
             if (registrationHandler.Sessions.Any(rs => rs.CommentButtonId == modalCustomId))
