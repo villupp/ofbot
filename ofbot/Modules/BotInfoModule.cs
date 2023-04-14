@@ -28,9 +28,8 @@ namespace OfBot.Modules
 
             var commandPrefix = MessageHandler.COMMAND_PREFIX;
             var customCommandPrefix = MessageHandler.CUSTOM_COMMAND_PREFIX;
-            await RespondAsync($"**Some useful commands:** `/git`, `/help`, `/registration`, `/pubgstats`, `/dotatracker`, `/pubgtracker` \n" +
-                $"**Custom commands use {customCommandPrefix} prefix.**\n" +
-                $"**To set (add or update) a custom command:**\n`{customCommandPrefix}set <command name> <command content>`\n" +
+            await RespondAsync($"**Some useful commands:**\n`/git`, `/help`, `/registration`, `/pubgstats`, `/dotatracker`, `/pubgtracker` \n" +
+                $"**Custom commands use {customCommandPrefix} prefix. To set (add or update) a custom command:**\n`{customCommandPrefix}set <command name> <command content>`\n" +
                 $"**To remove custom command:**\n`{customCommandPrefix}remove <command name>`\n" +
                 $"**To search for custom commands:**\n`{customCommandPrefix}search <search input>` or `{customCommandPrefix}s <search input>`"
                 , null, false, true
