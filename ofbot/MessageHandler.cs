@@ -6,7 +6,6 @@ namespace OfBot
 {
     public class MessageHandler
     {
-        public const char COMMAND_PREFIX = '-';
         public const char CUSTOM_COMMAND_PREFIX = '!';
 
         private ILogger logger;
@@ -45,16 +44,6 @@ namespace OfBot
             {
                 // Dont handle mentions or bot messages
                 return;
-            }
-            else if (message.HasCharPrefix(COMMAND_PREFIX, ref argPos))
-            {
-                logger.LogInformation($"Got command: '{message.Content}'");
-
-                // Execute the command (implementation in Modules folder)
-                await commandService.ExecuteAsync(
-                    context: context,
-                    argPos: argPos,
-                    services: serviceProvider);
             }
             else if (message.Content.ToLower().StartsWith($"{CUSTOM_COMMAND_PREFIX}set ") ||
                 message.Content.ToLower() == $"{CUSTOM_COMMAND_PREFIX}set")

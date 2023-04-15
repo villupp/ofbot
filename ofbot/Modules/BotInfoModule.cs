@@ -26,7 +26,6 @@ namespace OfBot.Modules
         {
             logger.LogInformation($"Help called. Sending help message..");
 
-            var commandPrefix = MessageHandler.COMMAND_PREFIX;
             var customCommandPrefix = MessageHandler.CUSTOM_COMMAND_PREFIX;
             await RespondAsync($"**Some useful commands:**\n`/git`, `/help`, `/registration`, `/pubgstats`, `/dotatracker`, `/pubgtracker` \n" +
                 $"**Custom commands use {customCommandPrefix} prefix. To set (add or update) a custom command:**\n`{customCommandPrefix}set <command name> <command content>`\n" +

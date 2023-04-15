@@ -68,7 +68,7 @@ namespace OfBot.Modules
             {
                 var errMsg = $"Cannot find valid session {(sessionid.HasValue ? $" with ID {sessionid}" : "")}";
                 logger.LogInformation(errMsg);
-                await ReplyAsync(errMsg);
+                await RespondAsync(errMsg, ephemeral: true);
                 return;
             }
 
@@ -104,7 +104,7 @@ namespace OfBot.Modules
             {
                 var errMsg = $"Cannot find session by {Context.User.Username}";
                 logger.LogInformation(errMsg);
-                await ReplyAsync(errMsg);
+                await RespondAsync(errMsg);
                 return;
             }
 
