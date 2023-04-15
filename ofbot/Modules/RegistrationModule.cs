@@ -84,7 +84,7 @@ namespace OfBot.Modules
             var sessionMessage = await ReplyAsync(null, components: btnComponent, embed: embed);
             session.Message = sessionMessage;
 
-            await RespondAsync("Bumped.", ephemeral: true);
+            await RespondAsync("Posted.", ephemeral: true);
         }
 
         // Changes registration session description
@@ -113,8 +113,6 @@ namespace OfBot.Modules
             logger.LogInformation($"Changed description of most recent session by {Context.User.Username}, ID {session.Id} to '{description}'. Reposting..");
 
             await Repost(session.Id);
-
-            await RespondAsync("Description changed.", ephemeral: true);
         }
     }
 }

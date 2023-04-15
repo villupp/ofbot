@@ -162,7 +162,28 @@ namespace OfBot
                             .WithName("changedescription")
                             .WithDescription("Changes description of your most recent registration session.")
                             .WithType(ApplicationCommandOptionType.SubCommand)
-                            .AddOption("description", ApplicationCommandOptionType.String, "Session description", isRequired: true))
+                            .AddOption("description", ApplicationCommandOptionType.String, "Session description", isRequired: true)),
+                    new SlashCommandBuilder()
+                        .WithName("customcommand")
+                        .WithDescription("Custom commands.")
+                        .AddOption(new SlashCommandOptionBuilder()
+                            .WithName("execute")
+                            .WithDescription("Executes a custom command.")
+                            .WithType(ApplicationCommandOptionType.SubCommand)
+                            .AddOption("commandname", ApplicationCommandOptionType.String, "Command name", isRequired: true)
+                            .AddOption("isprivate", ApplicationCommandOptionType.Boolean, "Respond only to initiator"))
+                        .AddOption(new SlashCommandOptionBuilder()
+                            .WithName("remove")
+                            .WithDescription("Removes a custom command.")
+                            .WithType(ApplicationCommandOptionType.SubCommand)
+                            .AddOption("commandname", ApplicationCommandOptionType.String, "Command name", isRequired: true))
+                         .AddOption(new SlashCommandOptionBuilder()
+                            .WithName("set")
+                            .WithDescription("Sets a custom command.")
+                            .WithType(ApplicationCommandOptionType.SubCommand)
+                            .AddOption("commandname", ApplicationCommandOptionType.String, "Command name", isRequired: true)
+                            .AddOption("commandcontent", ApplicationCommandOptionType.String, "Command name", isRequired: true))
+                        ,
                 };
 
                 try
