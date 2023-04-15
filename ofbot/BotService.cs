@@ -170,13 +170,13 @@ namespace OfBot
                             .WithName("execute")
                             .WithDescription("Executes a custom command.")
                             .WithType(ApplicationCommandOptionType.SubCommand)
-                            .AddOption("commandname", ApplicationCommandOptionType.String, "Command name", isRequired: true)
+                            .AddOption("commandname", ApplicationCommandOptionType.String, "Command name", isRequired: true, isAutocomplete: true)
                             .AddOption("isprivate", ApplicationCommandOptionType.Boolean, "Respond only to initiator"))
                         .AddOption(new SlashCommandOptionBuilder()
                             .WithName("remove")
                             .WithDescription("Removes a custom command.")
                             .WithType(ApplicationCommandOptionType.SubCommand)
-                            .AddOption("commandname", ApplicationCommandOptionType.String, "Command name", isRequired: true))
+                            .AddOption("commandname", ApplicationCommandOptionType.String, "Command name", isRequired: true, isAutocomplete: true))
                          .AddOption(new SlashCommandOptionBuilder()
                             .WithName("set")
                             .WithDescription("Sets a custom command.")
@@ -213,9 +213,8 @@ namespace OfBot
         {
             logger.LogInformation($"Installing commands");
 
-            var messageHandler = serviceProvider.GetService<MessageHandler>();
-            discordSocketClient.MessageReceived += messageHandler.Handle;
             discordSocketClient.SlashCommandExecuted += HandleSlashCommand;
+            discordSocketClient.AutocompleteExecuted += HandleAutocomplete;
 
             await commandService.AddModulesAsync(
                 assembly: Assembly.GetEntryAssembly(),
@@ -226,9 +225,15 @@ namespace OfBot
                 services: serviceProvider);
         }
 
+        private async Task HandleAutocomplete(SocketAutocompleteInteraction arg)
+        {
+            var context = new InteractionContext(discordSocketClient, arg, arg.Channel);
+            await interactionService.ExecuteCommandAsync(context, services: serviceProvider);
+        }
+
         private async Task HandleSlashCommand(SocketSlashCommand slashCommand)
         {
-            logger.LogInformation($"slash command {slashCommand.CommandName} executed");
+            logger.LogInformation($"Executing slash command {slashCommand.CommandName}");
 
             var context = new SocketInteractionContext(discordSocketClient, slashCommand);
 

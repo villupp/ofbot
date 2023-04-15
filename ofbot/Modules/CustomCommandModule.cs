@@ -1,5 +1,6 @@
 ﻿using Discord.Interactions;
 using Microsoft.Extensions.Logging;
+using OfBot.CommandHandlers.Autocomplete;
 using OfBot.TableStorage;
 using OfBot.TableStorage.Models;
 using System.Text.RegularExpressions;
@@ -23,7 +24,7 @@ namespace OfBot.Modules
 
         [SlashCommand("execute", "")]
         public async Task Execute(
-            string commandname, bool isprivate = false)
+            [Autocomplete(typeof(CommandNameHandler))] string commandname, bool isprivate = false)
         {
             var commandName = ParseCustomCommandName(commandname);
 
@@ -51,7 +52,7 @@ namespace OfBot.Modules
         }
 
         [SlashCommand("remove", "")]
-        public async Task Remove(string commandname)
+        public async Task Remove([Autocomplete(typeof(CommandNameHandler))] string commandname)
         {
             var commandName = ParseCustomCommandName(commandname);
 

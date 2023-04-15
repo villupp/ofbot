@@ -18,6 +18,7 @@ using OfBot.DotaTracker;
 using OfBot.PubgTracker;
 using OfBot.TableStorage;
 using OfBot.TableStorage.Models;
+using OfBot.TableStorage.Repositories;
 using System.Net;
 
 namespace OfBot
@@ -53,6 +54,8 @@ namespace OfBot
                     builder.AddTableServiceClient(botSettings.StorageKey);
                 });
 
+                services.AddMemoryCache();
+
                 services.AddHostedService<BotService>();
 
                 services.AddSingleton(serviceProvider => serviceProvider);
@@ -63,8 +66,6 @@ namespace OfBot
                 services.AddSingleton<DiscordSocketClient>();
                 services.AddSingleton<CommandService>();
                 services.AddSingleton<InteractionService>();
-                services.AddSingleton<CustomCommandService>();
-                services.AddSingleton<MessageHandler>();
                 services.AddSingleton<TableStorageService<Command>>();
                 services.AddSingleton<TableStorageService<PubgSeason>>();
                 services.AddSingleton<TableStorageService<PubgPlayer>>();
@@ -74,6 +75,7 @@ namespace OfBot
                 services.AddSingleton<ModalHandler>();
                 services.AddSingleton<AnnouncementService>();
                 services.AddSingleton<AuthenticationHandler>();
+                services.AddSingleton<CommandRepository>();
 
                 // DotaTracker
                 services.AddSingleton<TableStorageService<TrackedDotaPlayer>>();

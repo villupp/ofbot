@@ -7,7 +7,6 @@ namespace OfBot.TableStorage
     /* T should be a model class for the table with exact same name as table name in Azure Storage */
 
     public class TableStorageService<T> : ITableStorageService<T> where T : class, ITableEntity, new()
-
     {
         private readonly ILogger logger;
         private readonly TableClient tableClient;

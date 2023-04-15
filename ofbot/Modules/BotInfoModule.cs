@@ -26,12 +26,8 @@ namespace OfBot.Modules
         {
             logger.LogInformation($"Help called. Sending help message..");
 
-            var customCommandPrefix = MessageHandler.CUSTOM_COMMAND_PREFIX;
-            await RespondAsync($"**Some useful commands:**\n`/git`, `/help`, `/registration`, `/pubgstats`, `/dotatracker`, `/pubgtracker` \n" +
-                $"**Custom commands use {customCommandPrefix} prefix. To set (add or update) a custom command:**\n`{customCommandPrefix}set <command name> <command content>`\n" +
-                $"**To remove custom command:**\n`{customCommandPrefix}remove <command name>`\n" +
-                $"**To search for custom commands:**\n`{customCommandPrefix}search <search input>` or `{customCommandPrefix}s <search input>`"
-                , null, false, true
+            await RespondAsync($"**Some useful commands:**\n`/git`, `/help`, `/customcommand`, `/registration`, `/pubgstats`, `/dotatracker`, `/pubgtracker` \n"
+                , ephemeral: true
                 );
         }
     }
