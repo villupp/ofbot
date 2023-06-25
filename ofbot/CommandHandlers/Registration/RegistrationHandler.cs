@@ -38,7 +38,7 @@ namespace OfBot.CommandHandlers.Registration
                 for (var i = 0; i < session.InUsers.Count; i++)
                 {
                     var user = session.InUsers[i];
-                    lineupStr += $"**{user.Username}**";
+                    lineupStr += $"**{user.Nickname}**";
 
                     if (!string.IsNullOrEmpty(user.Comment))
                         lineupStr += $" ({user.Comment})";
@@ -49,16 +49,22 @@ namespace OfBot.CommandHandlers.Registration
             }
 
             if (session.OutUsers.Count > 0)
-                outStr = $"Out: {string.Join(", ", session.OutUsers)}\n";
+            {
+                var str = session.OutUsers.Select(user => user.Nickname);
+                outStr = $"Out: {string.Join(", ", str)}\n";
+            }
 
+            var author = session.CreatedBy as SocketGuildUser;
+            var authorField = new EmbedAuthorBuilder()
+                .WithName(author.Nickname)
+                .WithIconUrl(author.GetAvatarUrl());
             var embedBuilder = new EmbedBuilder()
-                 .WithTitle($"{session.Description}")
-                 .WithDescription(lineupStr)
-                 .WithAuthor(session.CreatedBy)
-                 .WithColor(Color.Blue)
-                 .WithFooter($"{outStr}ID: {session.Id}")
-                 .WithTimestamp(session.CreatedOn)
-                 ;
+                .WithAuthor(authorField)
+                .WithTitle($"{session.Description}")
+                .WithDescription(lineupStr)
+                .WithColor(Color.Blue)
+                .WithFooter($"{outStr}ID: {session.Id}")
+                .WithTimestamp(session.CreatedOn);
 
             return embedBuilder.Build();
         }
@@ -75,21 +81,19 @@ namespace OfBot.CommandHandlers.Registration
 
         public async Task OnRegister(Guid registerButtonId, SocketMessageComponent component)
         {
-            var userName = component.User.Username;
             var session = GetSession(registerButtonId);
-
-            var existingInUser = session.InUsers.Where(u => u.Username.ToLower() == userName.ToLower()).FirstOrDefault();
-
-            if (existingInUser == null)
-                session.InUsers.Add(new RegistrationUser()
-                {
-                    Username = userName,
-                });
+            var user = GetInUser(session, component.User.Username);
+            if (user == null)
+            {
+                user = BuildRegistrationUser(component.User);
+                session.InUsers.Add(user);
+            }
             else
-                existingInUser.Comment = null;
+            {
+                user.Comment = null;
+            }
 
-            if (session.OutUsers.Contains(userName))
-                session.OutUsers.Remove(userName);
+            session.OutUsers.Remove(user).ToString();
 
             await component.UpdateAsync(mp =>
             {
@@ -100,16 +104,16 @@ namespace OfBot.CommandHandlers.Registration
 
         public async Task OnUnregister(Guid unregisterButtonId, SocketMessageComponent component)
         {
-            var userName = component.User.Username;
             var session = GetSession(unregisterButtonId);
+            var user = GetInUser(session, component.User.Username);
+            if (user == null) {
+                user = BuildRegistrationUser(component.User);
+            }
 
-            var inUser = session.InUsers.Where(u => u.Username.ToLower() == userName.ToLower()).FirstOrDefault();
+            session.InUsers.Remove(user);
 
-            if (inUser != null)
-                session.InUsers.Remove(inUser);
-
-            if (!session.OutUsers.Contains(userName))
-                session.OutUsers.Add(userName);
+            if (!session.OutUsers.Contains(user))
+                session.OutUsers.Add(user);
 
             await component.UpdateAsync(mp =>
             {
@@ -129,7 +133,7 @@ namespace OfBot.CommandHandlers.Registration
                 return;
             }
 
-            var inUser = session.InUsers.Where(u => u.Username.ToLower() == component.User.Username.ToLower()).FirstOrDefault();
+            var inUser = GetInUser(session, component.User.Username);
 
             if (inUser != null && !string.IsNullOrEmpty(inUser.Comment))
                 existingComment = inUser.Comment;
@@ -144,7 +148,6 @@ namespace OfBot.CommandHandlers.Registration
 
         public async Task OnCommentModalSubmitted(Guid modalId, SocketModal modal)
         {
-            var userName = modal.User.Username;
             var commentButtonId = modalId;
             var session = GetSession(commentButtonId);
 
@@ -154,19 +157,16 @@ namespace OfBot.CommandHandlers.Registration
             comment = comment.Replace(@"(", "");
             comment = comment.Replace(@")", "");
 
-            var existingInUser = session.InUsers.Where(u => u.Username.ToLower() == userName.ToLower()).FirstOrDefault();
+            var user = GetInUser(session, modal.User.Username);
+            if (user == null)
+            {
+                user = BuildRegistrationUser(modal.User, comment);
+                session.InUsers.Add(user);
+            }
+            else if (user.Comment != comment)
+                user.Comment = comment;
 
-            if (existingInUser == null)
-                session.InUsers.Add(new RegistrationUser()
-                {
-                    Username = userName,
-                    Comment = comment
-                });
-            else if (existingInUser.Comment != comment)
-                existingInUser.Comment = comment;
-
-            if (session.OutUsers.Contains(userName))
-                session.OutUsers.Remove(userName);
+            session.OutUsers.Remove(user);
 
             await session.Message.ModifyAsync(mp =>
             {
@@ -196,7 +196,7 @@ namespace OfBot.CommandHandlers.Registration
                 CreatedOn = DateTime.UtcNow
             };
 
-            session.InUsers.Add(new RegistrationUser() { Username = createdBy.Username });
+            session.InUsers.Add(BuildRegistrationUser(createdBy));
 
             // Only keep max 10 session in memory
             if (Sessions.Count > 10)
@@ -236,6 +236,27 @@ namespace OfBot.CommandHandlers.Registration
                 || rs.UnregisterButtonId == buttonId
                 || rs.CommentButtonId == buttonId)
                 .FirstOrDefault();
+        }
+
+
+        private RegistrationUser GetInUser(RegistrationSession session, string username)
+        {
+            return session.InUsers.Where(u => u.Username.ToLower() == username.ToLower()).FirstOrDefault();
+        }
+
+        private RegistrationUser BuildRegistrationUser(SocketUser socketUser, string comment)
+        {
+            var user = socketUser as SocketGuildUser;
+            return new RegistrationUser()
+            {
+                Username = user.Username,
+                Nickname = user.Nickname,
+                Comment = comment
+            };
+        }
+        private RegistrationUser BuildRegistrationUser(SocketUser socketUser)
+        {
+            return BuildRegistrationUser(socketUser, null);
         }
     }
 }

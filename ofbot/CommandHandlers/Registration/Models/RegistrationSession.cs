@@ -8,14 +8,14 @@ namespace OfBot.CommandHandlers.Registration.Models
         public RegistrationSession()
         {
             InUsers = new List<RegistrationUser>();
-            OutUsers = new List<string>();
+            OutUsers = new List<RegistrationUser>();
         }
 
         public int Id { get; set; }
 
         public List<RegistrationUser> InUsers { get; set; }
 
-        public List<string> OutUsers { get; set; }
+        public List<RegistrationUser> OutUsers { get; set; }
 
         public Guid RegisterButtonId { get; set; }
 
