@@ -106,6 +106,9 @@ namespace OfBot.CommandHandlers.Registration
         {
             var session = GetSession(unregisterButtonId);
             var user = GetInUser(session, component.User.Username);
+            if (user == null) {
+                user = BuildRegistrationUser(component.User);
+            }
 
             session.InUsers.Remove(user);
 
