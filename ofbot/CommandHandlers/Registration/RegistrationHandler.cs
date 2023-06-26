@@ -38,7 +38,7 @@ namespace OfBot.CommandHandlers.Registration
                 for (var i = 0; i < session.InUsers.Count; i++)
                 {
                     var user = session.InUsers[i];
-                    lineupStr += $"**{user.Nickname}**";
+                    lineupStr += $"**{user.DisplayName}**";
 
                     if (!string.IsNullOrEmpty(user.Comment))
                         lineupStr += $" ({user.Comment})";
@@ -50,14 +50,18 @@ namespace OfBot.CommandHandlers.Registration
 
             if (session.OutUsers.Count > 0)
             {
-                var str = session.OutUsers.Select(user => user.Nickname);
+                var str = session.OutUsers.Select(
+                    user => user.DisplayName);
                 outStr = $"Out: {string.Join(", ", str)}\n";
             }
 
             var author = session.CreatedBy as SocketGuildUser;
+            var avatarUrl = author.GetDisplayAvatarUrl();
+            if (avatarUrl == null) 
+                avatarUrl = author.GetDefaultAvatarUrl();
             var authorField = new EmbedAuthorBuilder()
-                .WithName(author.Nickname)
-                .WithIconUrl(author.GetAvatarUrl());
+                .WithName(author.DisplayName)
+                .WithIconUrl(avatarUrl);
             var embedBuilder = new EmbedBuilder()
                 .WithAuthor(authorField)
                 .WithTitle($"{session.Description}")
@@ -247,16 +251,12 @@ namespace OfBot.CommandHandlers.Registration
         private RegistrationUser BuildRegistrationUser(SocketUser socketUser, string comment)
         {
             var user = socketUser as SocketGuildUser;
-            return new RegistrationUser()
-            {
-                Username = user.Username,
-                Nickname = user.Nickname,
-                Comment = comment
-            };
+            return new RegistrationUser(user.Username, user.DisplayName, comment);
         }
         private RegistrationUser BuildRegistrationUser(SocketUser socketUser)
         {
-            return BuildRegistrationUser(socketUser, null);
+            var user = socketUser as SocketGuildUser;
+            return new RegistrationUser(user.Username, user.DisplayName);
         }
     }
 }
