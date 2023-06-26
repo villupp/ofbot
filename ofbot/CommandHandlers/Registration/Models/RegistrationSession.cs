@@ -29,6 +29,6 @@ namespace OfBot.CommandHandlers.Registration.Models
 
         public DateTime CreatedOn { get; set; }
 
-        public SocketUser CreatedBy { get; set; }
+        public SocketGuildUser CreatedBy { get; set; }
     }
 }

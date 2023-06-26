@@ -1,4 +1,5 @@
 ﻿using Discord.Interactions;
+using Discord.WebSocket;
 using Microsoft.Extensions.Logging;
 using OfBot.CommandHandlers.Registration;
 using OfBot.CommandHandlers.Registration.Models;
@@ -29,11 +30,14 @@ namespace OfBot.Modules
             var registerButtonId = Guid.NewGuid();
             var commentButtonId = Guid.NewGuid();
             var unregisterButtonId = Guid.NewGuid();
+            var createdBy = Context.User as SocketGuildUser;
 
             if (string.IsNullOrEmpty(description))
-                description = $"{Context.User.Username}'s event";
+            {
+                description = $"{createdBy.Nickname ?? createdBy.DisplayName ?? createdBy.Username}'s event";
+            }
 
-            var session = await registrationHandler.CreateSession(registerButtonId, unregisterButtonId, commentButtonId, description, Context.User);
+            var session = await registrationHandler.CreateSession(registerButtonId, unregisterButtonId, commentButtonId, description, createdBy);
             var embed = RegistrationHandler.CreateLineupEmbed(session);
             var btnComponent = RegistrationHandler.CreateButtonComponent(session);
 

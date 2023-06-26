@@ -38,7 +38,7 @@ namespace OfBot.CommandHandlers.Registration
                 for (var i = 0; i < session.InUsers.Count; i++)
                 {
                     var user = session.InUsers[i];
-                    lineupStr += $"**{user.Nickname}**";
+                    lineupStr += $"**{user.Name}**";
 
                     if (!string.IsNullOrEmpty(user.Comment))
                         lineupStr += $" ({user.Comment})";
@@ -50,13 +50,15 @@ namespace OfBot.CommandHandlers.Registration
 
             if (session.OutUsers.Count > 0)
             {
-                var str = session.OutUsers.Select(user => user.Nickname);
+                var str = session.OutUsers.Select(user => user.Name);
                 outStr = $"Out: {string.Join(", ", str)}\n";
             }
 
-            var author = session.CreatedBy as SocketGuildUser;
+            var author = session.CreatedBy;
+            var embedUsername = author.Nickname ?? author.DisplayName ?? author.Username;
+
             var authorField = new EmbedAuthorBuilder()
-                .WithName(author.Nickname)
+                .WithName(embedUsername)
                 .WithIconUrl(author.GetAvatarUrl());
             var embedBuilder = new EmbedBuilder()
                 .WithAuthor(authorField)
@@ -85,7 +87,7 @@ namespace OfBot.CommandHandlers.Registration
             var user = GetInUser(session, component.User.Username);
             if (user == null)
             {
-                user = BuildRegistrationUser(component.User);
+                user = new RegistrationUser(component.User as SocketGuildUser);
                 session.InUsers.Add(user);
             }
             else
@@ -106,8 +108,9 @@ namespace OfBot.CommandHandlers.Registration
         {
             var session = GetSession(unregisterButtonId);
             var user = GetInUser(session, component.User.Username);
-            if (user == null) {
-                user = BuildRegistrationUser(component.User);
+            if (user == null)
+            {
+                user = new RegistrationUser(component.User as SocketGuildUser);
             }
 
             session.InUsers.Remove(user);
@@ -160,7 +163,7 @@ namespace OfBot.CommandHandlers.Registration
             var user = GetInUser(session, modal.User.Username);
             if (user == null)
             {
-                user = BuildRegistrationUser(modal.User, comment);
+                user = new RegistrationUser(modal.User as SocketGuildUser, comment);
                 session.InUsers.Add(user);
             }
             else if (user.Comment != comment)
@@ -177,7 +180,7 @@ namespace OfBot.CommandHandlers.Registration
             await modal.DeferAsync(true);
         }
 
-        public async Task<RegistrationSession> CreateSession(Guid registerButtonId, Guid unregisterButtonId, Guid commentButtonId, string description, SocketUser createdBy)
+        public async Task<RegistrationSession> CreateSession(Guid registerButtonId, Guid unregisterButtonId, Guid commentButtonId, string description, SocketGuildUser createdBy)
         {
             logger.LogInformation($"Creating new registration session with" +
                 $" register button ID {registerButtonId}" +
@@ -196,7 +199,7 @@ namespace OfBot.CommandHandlers.Registration
                 CreatedOn = DateTime.UtcNow
             };
 
-            session.InUsers.Add(BuildRegistrationUser(createdBy));
+            session.InUsers.Add(new RegistrationUser(createdBy));
 
             // Only keep max 10 session in memory
             if (Sessions.Count > 10)
@@ -238,25 +241,9 @@ namespace OfBot.CommandHandlers.Registration
                 .FirstOrDefault();
         }
 
-
         private RegistrationUser GetInUser(RegistrationSession session, string username)
         {
             return session.InUsers.Where(u => u.Username.ToLower() == username.ToLower()).FirstOrDefault();
-        }
-
-        private RegistrationUser BuildRegistrationUser(SocketUser socketUser, string comment)
-        {
-            var user = socketUser as SocketGuildUser;
-            return new RegistrationUser()
-            {
-                Username = user.Username,
-                Nickname = user.Nickname,
-                Comment = comment
-            };
-        }
-        private RegistrationUser BuildRegistrationUser(SocketUser socketUser)
-        {
-            return BuildRegistrationUser(socketUser, null);
         }
     }
 }
