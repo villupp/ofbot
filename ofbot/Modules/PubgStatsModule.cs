@@ -34,7 +34,7 @@ namespace OfBot.Modules
             if (player == null)
             {
                 logger.LogInformation($"Could not retrieve player. Stats not posted.");
-                await RespondAsync($"Player not found.");
+                await RespondAsync($"Player not found.", ephemeral: !ispublic);
                 return;
             }
 
@@ -48,10 +48,7 @@ namespace OfBot.Modules
             var seasonStats = await pubgStatsHandler.GetRankedStats(player, statsSeason);
             var embed = pubgStatsHandler.CreateStatsEmded(player, statsSeason, seasonStats);
 
-            if (ispublic)
-                await RespondAsync(null, embed: embed);
-            else
-                await RespondAsync(null, null, false, true, embed: embed);
+            await RespondAsync(null, embed: embed, ephemeral: !ispublic);
         }
 
         // Refreshes season cache

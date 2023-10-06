@@ -37,7 +37,7 @@ namespace OfBot
 
                 var discordSocketConfig = new DiscordSocketConfig()
                 {
-                    GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.MessageContent
+                    GatewayIntents = GatewayIntents.AllUnprivileged
                 };
 
                 var commandServiceConfig = new CommandServiceConfig()
