@@ -65,15 +65,18 @@ namespace OfBot.CommandHandlers.PubgStats
             // Sub tier not shown for master
             var subTierStr = "";
             var bestSubTierStr = "";
-
-            if (stats.CurrentTier.Tier != RANKTIER_NAME_MASTER)
-                subTierStr = $" {GetSubTierRomanNumeral(stats.CurrentTier?.SubTier)}";
+            var bestTierStr = "";
 
             if (stats.BestTier.Tier != RANKTIER_NAME_MASTER)
                 bestSubTierStr = $" {GetSubTierRomanNumeral(stats.BestTier?.SubTier)}";
 
-            statsStr += $"Rank: **{stats.CurrentTier?.Tier}{subTierStr}** " +
-                $"(season high: **{stats.BestTier?.Tier}{bestSubTierStr}**)";
+            if (stats.CurrentTier.Tier != RANKTIER_NAME_MASTER)
+            {
+                bestTierStr = $" (season high: **{stats.BestTier?.Tier}{bestSubTierStr}**)";
+                subTierStr = $" {GetSubTierRomanNumeral(stats.CurrentTier?.SubTier)}";
+            }
+
+            statsStr += $"Rank: **{stats.CurrentTier?.Tier}{subTierStr}**{bestTierStr}";
             statsStr += $"\nRP: **{stats.CurrentRankPoint}** (season high: **{stats.BestRankPoint}**)";
             statsStr += $"\nMatches: **{stats.RoundsPlayed}** Wins: **{stats.Wins}** (**{string.Format("{0:0.0#}", stats.WinRatio * 100)}%**)";
             statsStr += $"\nAvg placement: **#{string.Format("{0:0.0#}", stats.AvgRank)}** Top 10: **{string.Format("{0:0.0#}", stats.Top10Ratio * 100)}%**";
