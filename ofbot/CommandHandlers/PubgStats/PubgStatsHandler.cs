@@ -10,8 +10,8 @@ namespace OfBot.CommandHandlers.PubgStats
 {
     public class PubgStatsHandler
     {
-        private const string SEASONID_PREFIX_PC = "division.bro.official.pc-2018-";
-
+        private const string SEASONID_PREFIX_RANKED_SQUAD_FPP_PC = "division.bro.official.pc-2018-";
+        private const string RANKTIER_NAME_MASTER = "Master";
         private ILogger logger;
         private PubgApiClient pubgClient;
         private TableStorageService<PubgSeason> seasonTableService;
@@ -39,7 +39,7 @@ namespace OfBot.CommandHandlers.PubgStats
         public Embed CreateStatsEmded(PubgPlayer player, PubgSeason season, RankedStats rankedStats)
         {
             var statsStr = "";
-            var seasonNumber = season.Id.Replace(SEASONID_PREFIX_PC, "");
+            var seasonNumber = season.Id.Replace(SEASONID_PREFIX_RANKED_SQUAD_FPP_PC, "");
             var titleText = $"PUBG ranked season {seasonNumber} squad FPP stats for player {player.Name}";
             var pubgOpGgUrl = $"https://pubg.op.gg/user/{player.Name}";
 
@@ -62,8 +62,19 @@ namespace OfBot.CommandHandlers.PubgStats
                 kdrDisplay = string.Format("{0:0.0#}", kdr);
             }
 
-            statsStr += $"Rank: **{stats.CurrentTier?.Tier} {GetSubTierRomanNumeral(stats.CurrentTier?.SubTier)}** " +
-                $"(season high: **{stats.BestTier?.Tier} {GetSubTierRomanNumeral(stats.BestTier?.SubTier)}**)";
+            // Sub tier not shown for master
+            var subTierStr = "";
+            var bestSubTierStr = "";
+
+            if (stats.CurrentTier.Tier != RANKTIER_NAME_MASTER)
+                subTierStr = $" {GetSubTierRomanNumeral(stats.CurrentTier?.SubTier)}";
+
+            if (stats.BestTier.Tier != RANKTIER_NAME_MASTER)
+                bestSubTierStr = $" {GetSubTierRomanNumeral(stats.BestTier?.SubTier)}";
+
+            statsStr += $"Rank: **{stats.CurrentTier?.Tier}{subTierStr}** " +
+                $"(season high: **{stats.BestTier?.Tier}{bestSubTierStr}**)";
+            statsStr += $"\nRP: **{stats.CurrentRankPoint}** (season high: **{stats.BestRankPoint}**)";
             statsStr += $"\nMatches: **{stats.RoundsPlayed}** Wins: **{stats.Wins}** (**{string.Format("{0:0.0#}", stats.WinRatio * 100)}%**)";
             statsStr += $"\nAvg placement: **#{string.Format("{0:0.0#}", stats.AvgRank)}** Top 10: **{string.Format("{0:0.0#}", stats.Top10Ratio * 100)}%**";
             statsStr += $"\nKDR: **{kdrDisplay}** KDA: **{string.Format("{0:0.0#}", stats.Kda)}** Avg dmg: **{string.Format("{0:0}", stats.DamageDealt / stats.RoundsPlayed)}**";
@@ -163,12 +174,16 @@ namespace OfBot.CommandHandlers.PubgStats
             return pubgPlayer;
         }
 
-        public async Task<PubgSeason> GetCurrentSeason()
+        public async Task<PubgSeason> GetSeason(int seasonNumber = -1)
         {
             if (Seasons == null || Seasons.Count == 0)
                 await PopulateSeasons();
 
-            return Seasons.Where(s => s.IsCurrentSeason && s.Id.StartsWith(SEASONID_PREFIX_PC)).FirstOrDefault();
+            if (seasonNumber == -1)
+                // Current season
+                return Seasons.Where(s => s.IsCurrentSeason && s.Id.StartsWith(SEASONID_PREFIX_RANKED_SQUAD_FPP_PC)).FirstOrDefault();
+            else
+                return Seasons.Where(s => s.Id == $"{SEASONID_PREFIX_RANKED_SQUAD_FPP_PC}{seasonNumber}").FirstOrDefault();
         }
 
         public async Task<RankedStats> GetRankedStats(PubgPlayer player, PubgSeason season)

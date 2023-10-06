@@ -140,6 +140,7 @@ namespace OfBot
                             .WithDescription("Get player stats for current ranked season (squad FPP).")
                             .WithType(ApplicationCommandOptionType.SubCommand)
                             .AddOption("playername", ApplicationCommandOptionType.String, "PUBG player name (case sensitive)", isRequired: true)
+                            .AddOption("season", ApplicationCommandOptionType.Integer, "Ranked season number")
                             .AddOption("ispublic", ApplicationCommandOptionType.Boolean, "Announce stats in public response"))
                         .AddOption(new SlashCommandOptionBuilder()
                             .WithName("refreshseasons")

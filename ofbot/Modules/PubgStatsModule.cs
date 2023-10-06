@@ -18,7 +18,7 @@ namespace OfBot.Modules
 
         // Posts PUBG player stats for current ongoing season
         [SlashCommand("player", "")]
-        public async Task CurrentSeasonStats(string playername, bool ispublic = false)
+        public async Task CurrentSeasonStats(string playername, bool ispublic = false, int season = -1)
         {
             logger.LogInformation($"CurrentSeasonStats initiated by {Context.User.Username} for player '{playername}'");
 
@@ -29,7 +29,7 @@ namespace OfBot.Modules
             }
 
             var player = await pubgStatsHandler.GetPlayer(playername);
-            var season = await pubgStatsHandler.GetCurrentSeason();
+            var statsSeason = await pubgStatsHandler.GetSeason(season);
 
             if (player == null)
             {
@@ -38,15 +38,15 @@ namespace OfBot.Modules
                 return;
             }
 
-            if (season == null)
+            if (statsSeason == null)
             {
-                logger.LogInformation($"Could not retrieve current season. Stats not posted.");
+                logger.LogInformation($"Could not retrieve season. Stats not posted.");
                 await RespondAsync($"Ranked season not found. There might be an issue. Use `-pubgstats rs` to refresh season cache.");
                 return;
             }
 
-            var seasonStats = await pubgStatsHandler.GetRankedStats(player, season);
-            var embed = pubgStatsHandler.CreateStatsEmded(player, season, seasonStats);
+            var seasonStats = await pubgStatsHandler.GetRankedStats(player, statsSeason);
+            var embed = pubgStatsHandler.CreateStatsEmded(player, statsSeason, seasonStats);
 
             if (ispublic)
                 await RespondAsync(null, embed: embed);
