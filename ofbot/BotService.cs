@@ -3,7 +3,6 @@ using Discord.Commands;
 using Discord.Interactions;
 using Discord.Net;
 using Discord.WebSocket;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OfBot.Components;
@@ -86,6 +85,11 @@ namespace OfBot
                     _ = pubgPoller.Start().ConfigureAwait(false);
                 }
 
+                var oldCommandNames = new string[]
+                {
+                    "pubgstats"
+                };
+
                 var slashCommands = new List<SlashCommandBuilder>
                 {
                     new SlashCommandBuilder()
@@ -133,20 +137,6 @@ namespace OfBot
                             .WithDescription("List all tracked players.")
                             .WithType(ApplicationCommandOptionType.SubCommand)),
                     new SlashCommandBuilder()
-                        .WithName("pubgstats")
-                        .WithDescription("PUBG stats related commands.")
-                        .AddOption(new SlashCommandOptionBuilder()
-                            .WithName("player")
-                            .WithDescription("Get player stats for current ranked season (squad FPP).")
-                            .WithType(ApplicationCommandOptionType.SubCommand)
-                            .AddOption("playername", ApplicationCommandOptionType.String, "PUBG player name (case sensitive)", isRequired: true)
-                            .AddOption("season", ApplicationCommandOptionType.Integer, "Ranked season number")
-                            .AddOption("ispublic", ApplicationCommandOptionType.Boolean, "Announce stats in public response"))
-                        .AddOption(new SlashCommandOptionBuilder()
-                            .WithName("refreshseasons")
-                            .WithDescription("Refreshes season cache. Might take some time to complete.")
-                            .WithType(ApplicationCommandOptionType.SubCommand)),
-                    new SlashCommandBuilder()
                         .WithName("registration")
                         .WithDescription("Create a new registration session.")
                         .AddOption(new SlashCommandOptionBuilder()
@@ -186,6 +176,25 @@ namespace OfBot
                             .AddOption("commandcontent", ApplicationCommandOptionType.String, "Command name", isRequired: true))
                         ,
                 };
+
+                try
+                {
+                    // Remove old command if they exist
+                    var guild = await discordSocketClient.Rest.GetGuildAsync(botSettings.PrimaryGuildId);
+                    var cmds = await guild.GetSlashCommandsAsync();
+
+                    foreach (var oldCmdName in oldCommandNames)
+                    {
+                        var cmd = cmds.Where(c => c.Name == oldCmdName).FirstOrDefault();
+
+                        if (cmd != null)
+                            await cmd.DeleteAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError($"Error while deleting old slash commands: {ex}");
+                }
 
                 try
                 {
