@@ -2,7 +2,6 @@
 using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -98,9 +97,12 @@ namespace OfBot
             })
                 .ConfigureLogging((context, builder) =>
                 {
-                    string instrumentationKey = botSettings.ApplicationInsightsKey;
-                    if (!string.IsNullOrEmpty(instrumentationKey))
-                        builder.AddApplicationInsightsWebJobs(o => o.InstrumentationKey = instrumentationKey);
+                    builder.ClearProviders();
+                    builder.AddConsole();
+                    if (!string.IsNullOrEmpty(botSettings.AppInsightsConnectionString))
+                        builder.AddApplicationInsights(
+                            configureTelemetryConfiguration: (config) => config.ConnectionString = botSettings.AppInsightsConnectionString,
+                            configureApplicationInsightsLoggerOptions: (config) => { });
                 })
             .Build();
 

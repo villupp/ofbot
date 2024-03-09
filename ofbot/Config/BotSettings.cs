@@ -4,7 +4,7 @@
     {
         public string BotToken { get; set; }
         public string StorageKey { get; set; }
-        public string ApplicationInsightsKey { get; set; }
+        public string AppInsightsConnectionString { get; set; }
         public string SteamApiKey { get; set; }
         public ulong PrimaryGuildId { get; set; }
         public string AnnouncementGuild { get; set; }

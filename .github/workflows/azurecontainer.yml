@@ -1,0 +1,45 @@
+name: Build and Deploy to Azure Container App
+on:
+  push:
+    branches:
+      - 'main'
+  workflow_dispatch:
+jobs:
+  build:
+    name: 'Build and Push to ACR'
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Docker Login
+        uses: azure/docker-login@v1
+        with:
+          login-server: villuppacr.azurecr.io
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Build and Push to ACR
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: villuppacr.azurecr.io/ofbot:latest,villuppacr.azurecr.io/ofbot:${{ github.sha }}
+          file: Dockerfile
+          
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+      - name: Build and deploy Container App
+        uses: azure/container-apps-deploy-action@v1
+        with:
+          acrName: villuppacr
+          containerAppName: vp-ofbot-ca
+          resourceGroup: vp-discordbots-rg
+          imageToDeploy: villuppacr.azurecr.io/ofbot:${{ github.sha }}
