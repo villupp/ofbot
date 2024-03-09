@@ -12,4 +12,4 @@ RUN dotnet publish -c Release -o out
 FROM mcr.microsoft.com/dotnet/runtime:8.0
 WORKDIR /ofbot
 COPY --from=build-env /ofbot/out .
-ENTRYPOINT ["dotnet", "ofbot.dll"]
+ENTRYPOINT ["dotnet", "OfBot.dll"]
