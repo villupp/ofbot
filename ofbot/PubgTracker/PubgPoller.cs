@@ -244,6 +244,7 @@ namespace OfBot.PubgTracker
                 "Savage_Main" => "Sanhok",
                 "Summerland_Main" => "Karakin",
                 "Tiger_Main" => "Taego",
+                "Neon_Main" => "Rondo",
                 _ => internalMapName,
             };
         }
